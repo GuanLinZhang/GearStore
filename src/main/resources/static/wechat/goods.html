@@ -1,0 +1,339 @@
+<link rel="stylesheet" href="css/goods.css">
+<div id="type_area">
+  <div class="weui-search-bar" id="searchBar" style="background-color: white">
+    <div class="weui-search-bar__form" style="background-color: white">
+      <div class="weui-search-bar__box" style="background-color: white">
+        <i class="weui-icon-search"></i>
+        <input type="search" class="weui-search-bar__input" id="searchInput" placeholder="搜索" onsearch="doSearch()">
+        <a href="javascript:" class="weui-icon-clear" id="searchClear"></a>
+      </div>
+      <label class="weui-search-bar__label" id="searchText"
+             style="background-color: #e5e5e5;border-radius: 10px;">
+        <i class="weui-icon-search"></i>
+        <span>您要的瓜果蔬菜都在这里</span>
+      </label>
+    </div>
+    <a href="javascript:" class="weui-search-bar__cancel-btn" id="searchCancel">取消</a>
+  </div>
+  <!-- 容器 -->
+  <!--<div class="weui-tab">-->
+  <!--类别导航栏-->
+  <!--  <div class="weui-navbar">-->
+  <!--    <a class="weui-navbar__item weui-bar__item&#45;&#45;on" href="#" style="background-color: white">-->
+  <!--     蔬菜区-->
+  <!--    </a>-->
+  <!--    <a class="weui-navbar__item weui-bar__item&#45;&#45;on" href="#">-->
+  <!--      水果区-->
+  <!--    </a>-->
+  <!--  </div>-->
+
+  <!--滚动的导航栏 分为两种状态-->
+  <div class="navbar">
+    <!--        <a href="#" class="actived">-->
+    <!--          <div class="goods_navbar">-->
+    <!--            <div class="goods_a"><a id="active_a" href="#">蔬菜区</a></div>-->
+    <!--            <div id="goods_options" class="active_options"></div>-->
+    <!--          </div>-->
+    <!--        </a>-->
+    <!--    &lt;!&ndash;    未被选中的类别&ndash;&gt;-->
+    <!--    <a href="#" class="actived">-->
+    <!--      <div class="goods_navbar">-->
+    <!--        <div class="goods_a"><a href="#">蔬菜区</a></div>-->
+    <!--        <div class="goods_options"></div>-->
+    <!--      </div>-->
+    <!--    </a>-->
+    <!--    <a href="#" class="actived">-->
+    <!--      <div class="goods_navbar">-->
+    <!--        <div class="goods_a"><a href="#">蔬菜区</a></div>-->
+    <!--        <div class="goods_options"></div>-->
+    <!--      </div>-->
+    <!--    </a>-->
+    <!--    <a href="#" class="actived">-->
+    <!--      <div class="goods_navbar">-->
+    <!--        <div class="goods_a"><a href="#">蔬菜区</a></div>-->
+    <!--        <div class="goods_options"></div>-->
+    <!--      </div>-->
+    <!--    </a>-->
+
+
+  </div>
+
+  <!--  详情区-->
+  <div class="weui-tab__bd">
+    <!--    蔬菜区详情-->
+    <div id="tab1" class="weui-tab__bd-item weui-tab__bd-item--active">
+    </div>
+    <!--    水果区详情-->
+  </div>
+  <a id="form-submit" class="weui-btn weui-btn_primary  ladda-button btn-block" data-style="expand-right"
+     data-size="l">
+<!--    <img src="../wxassert/images/clickBtn.png" alt="">-->
+    <span id="span" class="ladda-label">点击查看下一页</span>
+  </a>
+  <!--</div>-->
+</div>
+
+
+<script>
+    var pageCurrent = 0;
+    var pageCount = 0;
+    $(function () {
+        $("#slidder").data("categoryId", 101);
+        Ladda.bind('#form-submit');
+        getGoodsList();
+        renderNavBar();
+        $('#form-submit').on("click", function (e) {
+            $.showLoading();
+            e.preventDefault();
+            var l = Ladda.create(this);
+            l.start();
+            pageCurrent++;
+            console.log("pageCurrent", pageCurrent);
+            console.log("pageCount", pageCount);
+            // l.start();
+            if (pageCount < 1) {
+                $("#form-submit").attr("class", "weui-btn weui-btn_primary weui-btn_disabled ladda-button btn-block");
+                // document.getElementById("span").innerText = "没有更多了!";
+                $("span.ladda-label").text("没有更多了!");
+                $("#form-submit").blur();
+                console.log("fuck");
+                l.stop();
+            }
+
+            $.get("/goods/get",
+                {
+                    "pageCurrent": pageCurrent,
+                    "categoryId": $("#slidder").data("categoryId") == null ? 101 : $("#slidder").data("categoryId"),
+                    "status": 1,
+                },
+                function (result) {
+                    if (result.state === 1) {
+                        //显示数据
+                        console.log(result);
+                        renderGoodsList(result.data.records);
+                        pageCount--;
+                    } else {
+                        alert(result.message);
+                    }
+                }).always(function () {
+                    $.hideLoading();
+                    l.stop();
+                    $("#form-submit").blur();
+                }
+            );
+            return false;
+        });
+        $("#searchCancel").on("click", searchCancelBtnClicked);
+    });
+
+    function searchCancelBtnClicked() {
+        $("#vege_tabbar").trigger("click");
+    }
+
+    function addToCart() {
+        let vBody = $(this).parent().parent();
+        let goods_id = vBody.data("goods_id");
+        let openId = sessionStorage.getItem("openId");
+
+        $.ajax({
+            url: "/cart/add",
+            method: "post",
+            data: {
+                openId: openId,
+                goods_id: goods_id,
+                quantity: 1,
+            }
+        }).done(function (res) {
+            if (res.state === 1) {
+                $.toptip('商品添加购物车成功，请点击购物车按钮查看', 2000, 'success');
+            }
+        })
+    }
+
+    function doSearch() {
+        $.showLoading("正在查询...");
+        $("#form-submit").addClass("weui-btn_disabled").text("暂无更多");
+        let searchInput = $("#searchInput");
+        let goods_name = searchInput.val();
+        if (goods_name === null || goods_name === '') {
+            $.alert("搜索内容不能为空");
+            searchInput.val("");
+            return;
+        }
+        $.ajax({
+            url: "/goods/get",
+            method: "get",
+            data: {
+                goodsName: goods_name,
+                status: 1,
+            }
+        }).done(function (res) {
+            $("#tab1").empty();
+            let records = res.data.records;
+            if (records.length === 0) {
+                addEmptyImg($("#tab1"));
+            }
+            renderGoodsList(records);
+            $.hideLoading();
+        })
+    }
+
+    function addEmptyImg(parentObj) {
+        $("#form-submit").hide();
+        let img = $("<img id='empty' />");
+        $(parentObj).css({
+            "align-items": "center",
+            "margin-top": "100px",
+        });
+        img.css({
+            "width": "240px",
+            "height": "185px",
+            "background-size": "100% 100%",
+            "background-repeat": "no-repeat",
+            "margin": "0 auto",
+            "display": "block",
+            "vertical-align": "middle",
+            "outline": "none",
+            "border": "none",
+        });
+        img.attr("src", "img/empty3.png");
+        $(parentObj).append(img);
+    }
+
+    function renderGoodsList(records) {
+        let tab = $("#tab1");
+        records.forEach(function (item) {
+            let vBody = $("<div class='vg_Body'></div>");
+            vBody.data("goods_id", item.goods_id);
+            let ve_Img = $("<div class='ve_Img'></div>");
+            let goods_Img = $("<img/>");
+            goods_Img.attr("src", item.cover_img);
+            ve_Img.append(goods_Img);
+            vBody.append(ve_Img);
+
+            let ve_Info = $("<div class='ve_info'></div>");
+            let ve_Number = $("<div class='ve_Number'></div>");
+            let ve_Detail = $("<div class='ve_detail'></div>");
+            let ve_type = $("<div class='ve_type'></div>");
+            ve_type.text(item.goods_name);
+            ve_Detail.append(ve_type);
+            let ve_g = $("<div class='ve_g'></div>");
+            ve_g.text(item.price + "元/500g");
+            ve_Detail.append(ve_g);
+            ve_Number.append(ve_Detail);
+
+            // let vg_integral = $("<div class='vg_integral'></div>");
+            // let vg_point = $("<div class='vg_point'>单价</div>");
+            // vg_integral.append(vg_point);
+            // let vg_point_number = $("<div class='vg_point_number'></div>");
+            // vg_point_number.text(item.price + "元/500g");
+            // vg_integral.append(vg_point_number);
+            // ve_Number.append(vg_integral);
+            ve_Info.append(ve_Number);
+
+            let ve_cart = $("<div class='ve_cart'></div>");
+            let ve_cart_a = $("<a />");
+            ve_cart.on("click", addToCart);
+            let ve_cart_img = $("<img src='img/addcart3.png'/>");
+            ve_cart_a.append(ve_cart_img);
+            ve_cart.append(ve_cart_a);
+            ve_Info.append(ve_cart);
+            vBody.append(ve_Info);
+            // $("#form-submit").before(vBody);
+            tab.append(vBody);
+        })
+
+    }
+
+    function getGoodsList() {
+        // let slidder = $("#slidder");
+        // let categoryId = slidder.data("categoryId");
+        // if (categoryId == null) {
+        //     categoryId = 20;
+        //     slidder.data("categoryId", categoryId);
+        // }
+        // console.log("pageCurrent", ++pageCurrent);
+        $.ajax({
+            url: "/goods/get",
+            method: "get",
+            data: {
+                categoryId: 101,
+                pageCurrent: ++pageCurrent,
+                status: 1,
+            }
+        }).done(function (res) {
+            console.log(res);
+            pageCount = res.data.pageCount;
+            console.log(pageCount);
+            renderGoodsList(res.data.records);
+
+        })
+
+    }
+
+
+    function renderGoodsListByCategoryId() {
+        let goods_navList = $(".goods_navbar");
+        goods_navList.each(function (index, item) {
+            $(item).find(".goods_a a").removeAttr("id");
+            $(item).find(".goods_options").removeClass("active_options");
+        });
+        $(this).find(".goods_a a").attr("id", "active_a");
+        $(this).find(".goods_options").addClass("active_options");
+
+        $("#form-submit").removeClass("weui-btn_disabled").text("点击查看下一页");
+        let category_id = $(this).data("categoryId");
+        $("#slidder").data("categoryId", category_id);
+        pageCurrent = 0;
+        $.ajax({
+            url: "/goods/get",
+            method: "get",
+            data: {
+                categoryId: category_id,
+                pageCurrent: ++pageCurrent,
+                status: 1,
+            }
+        }).done(function (res) {
+            let tab1 = $("#tab1");
+            tab1.empty();
+            let records = res.data.records;
+            if (records.length === 0) {
+                addEmptyImg(tab1);
+            } else {
+                pageCount = res.data.pageCount;
+                renderGoodsList(records);
+            }
+        })
+    }
+
+    function renderNavBar() {
+        $.ajax({
+            url: "/category/getAll",
+            method: "get",
+        }).done(function (res) {
+            let navBar = $(".navbar");
+            let records = res.data;
+            records.forEach(function (item, index) {
+                let goods_navBar = $("<div class='goods_navbar'/>");
+                goods_navBar.on("click", renderGoodsListByCategoryId);
+                goods_navBar.data("categoryId", item.id);
+                let goods_a = $("<div class='goods_a'/>");
+                let category_name_a = $("<a/>");
+                category_name_a.text(item.category_name);
+                goods_a.append(category_name_a);
+                goods_navBar.append(goods_a);
+
+                let goods_options = $("<div class='goods_options'>");
+                if (index === 0) {
+                    category_name_a.attr("id", "active_a");
+                    goods_options.addClass("active_options");
+                }
+                goods_navBar.append(goods_options);
+                navBar.append(goods_navBar);
+            })
+        })
+    }
+
+</script>
+
+

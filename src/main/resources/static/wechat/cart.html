@@ -1,0 +1,431 @@
+<link rel="stylesheet" href="css/cart.css">
+<!--<div class="bd">-->
+<!--  <div class="page_bd">-->
+<div class="bg">
+  <!--        <div class="weui-cells weui-cells_checkbox middle">-->
+  <!--          &lt;!&ndash;    checkbox&ndash;&gt;-->
+  <!--          <label for="s11" class="checkbox">-->
+  <!--            <div class="weui-cell__hd">-->
+  <!--              <input type="checkbox" class="weui-check" name="checkbox1" id="s11" checked="checked">-->
+  <!--              <i class="weui-icon-checked"></i>-->
+  <!--            </div>-->
+  <!--          </label>-->
+  <!--          &lt;!&ndash;    购物车详情&ndash;&gt;-->
+  <!--          <div class="weui-cell__bdcart_List">-->
+  <!--            <div class="list_Img">-->
+  <!--              <img src="img/text_fruits.png" alt="图片">-->
+  <!--            </div>-->
+  <!--            <div class="list_detail">-->
+  <!--              <div class="list_type">-->
+  <!--                <div class="name">西红柿</div>-->
+  <!--                <div class="g">500g</div>-->
+  <!--              </div>-->
+  <!--              <div class="weui-cell">-->
+  <!--                <div class="weui-cell__bd ">-->
+  <!--                  <p>8积分</p>-->
+  <!--                </div>-->
+  <!--                <div class="weui-cell__ft">-->
+  <!--                  <div class="weui-count">-->
+  <!--                    <a class="weui-count__btn weui-count__decrease"></a>-->
+  <!--                    <input class="weui-count__number" type="number" value="1"/>-->
+  <!--                    <a class="weui-count__btn weui-count__increase"></a>-->
+  <!--                  </div>-->
+  <!--                </div>-->
+  <!--              </div>-->
+  <!--            </div>-->
+  <!--          </div>-->
+
+  <!--        </div>-->
+</div>
+<div class="reservation"> <!--  预定-->
+  <div class="Integral_Change">
+    <div class="my_integral">我的金额:
+      <div class="my_integral_Nb">0元</div>
+    </div>
+    <div class="current_integral">当前消费:
+      <div class="current_integral_Nb">0元</div>
+    </div>
+    <div class="rest_integral">余额:
+      <div class="rest_integral_Nb">0元</div>
+    </div>
+  </div>
+  <div class="select">
+    <button href="#" id="delete" class="weui-btn  select_btn" style="background-color: red">
+      删&nbsp;除
+    </button>
+    <button href="#" id="book" class="weui-btn  select_btn">
+      预&nbsp;定
+    </button>
+  </div>
+</div>
+
+<script>
+    $(function () {
+        let openId = sessionStorage.getItem("openId");
+        if (openId === null || openId === '') {
+            $.toast("OpenId为空,跳转到首页重新授权", "forbidden");
+            window.location.href = "index.html";
+        }
+        $("#book").on("click", bookBtnClicked);
+        $("#all").on("click", selAllBtnClicked);
+        $("#delete").on("click", deleteBtnClicked);
+        getCart();
+    });
+
+    function deleteBtnClicked() {
+        $.confirm({
+            title: '确认删除?',
+            text: '您确认删除已选择的商品吗?',
+            onOK: function () {
+                //点击确认
+                let checkedList = getCheckedItem();
+                let idList = [];
+                checkedList.forEach(function (item) {
+                    idList.push(item.id);
+                });
+                if (idList.length === 0) {
+                    $.hideLoading();
+                    $.toptip('请选择要删除的商品', 'error');
+                    return;
+                }
+                $.showLoading("正在删除...");
+                $.ajax({
+                    url: "/cart/delete",
+                    method: "delete",
+                    dataType: "json",
+                    data: {
+                        "idList": idList,
+                    }
+                }).done(function (res) {
+                    $.hideLoading();
+                    if (res.state === 1) {
+                        $.toptip('删除成功', 'error');
+                    } else {
+                        $.toast(res.message, "forbidden");
+                    }
+                    $("#slidder").load("/doCartUI");
+                })
+            },
+        });
+    }
+
+    function selAllBtnClicked() {
+        $(this).val() === "on" ? $(this).val("off") : $(this).val("on");
+        // console.log("selAllBtn");
+        // let checkList = $(".weui-check");
+        // checkList.each(function (index, item) {
+        //     console.log("item", item);
+        //     if (typeof ($(item).attr("checked")) != "undefined") {
+        //         $(item).removeAttr("checked");
+        //         $(item).val("off");
+        //     } else {
+        //         $(item).attr("checked", "checked");
+        //         $(item).val("on");
+        //     }
+        // });
+        let checkList = $(".weui-check");
+        if ($(this).val() === "on") {
+            checkList.each(function (index, item) {
+                $(item).attr("checked", "checked");
+                // $(item).val("on");
+            })
+        } else {
+            checkList.each(function (index, item) {
+                if (typeof ($(item).attr("checked")) != "undefined") {
+                    $(item).removeAttr("checked");
+                    // $(item).val("off");
+                }
+            })
+        }
+        getSelectedIntegral();
+        // if ($(this).val() === "on") {
+        //     $(".weui-cells.weui-cells_checkbox.middle").each(function (index, item) {
+        //         let integral = parseFloat($(item).find(".weui-cell__bd p").text());
+        //         console.log($(item).find(".weui-count__number").val());
+        //         let amount = $(item).find(".weui-count__number").val();
+        //         console.log(integral * amount);
+        //         $(".current_integral_Nb").text(integral * amount);
+        //     })
+        // }
+
+    }
+
+    function getCheckedItem() {
+        let resultList = [];
+        let itemList = $(".weui-cells.weui-cells_checkbox.middle");
+        itemList.each(function (index, item) {
+            let status = $(item).find(".weui-check").val();
+            if (status === "on") {
+                resultList.push({
+                    goods_id: $(item).data("goods_id"),
+                    quantity: $(item).find(".weui-count__number").val(),
+                    price: parseFloat($(item).find(".weui-cell__bd p").text()),
+                    id: $(item).data("cartItemId"),
+                })
+            }
+        });
+        return resultList;
+    }
+
+    function bookBtnClicked() {
+        let length = getCheckedItem().length;
+        console.log("length", length);
+        if (length === 0) {
+            $.toast("选中商品不能为空", "cancel");
+            return;
+        }
+        let balance = parseFloat($(".rest_integral_Nb").text());
+        console.log(balance);
+        if (balance < 0) {
+            $.toast("余额不足,请充值", "cancel");
+            return;
+        }
+        $.confirm({
+            title: '确定创建订单吗?',
+            text: '您确定要创建订单吗?',
+            onOK: function () {
+                createNewOrder();
+            },
+        });
+    }
+
+    function hasSelectedExpress() {
+        let senderName = null;
+        let telephone = null;
+        let address = null;
+
+        $.showLoading("查询用户快递信息中...");
+        $.ajax({
+            url: "/express/get",
+            method: "get",
+            async: false,
+            data: {
+                openId: sessionStorage.getItem("openId"),
+                is_selected: 1,
+            }
+        }).done(function (res) {
+            $.hideLoading();
+            let result = res.data[0];
+            console.log(result);
+            senderName = result.sender_name;
+            telephone = result.telephone;
+            address = result.address;
+            console.log("senderName", senderName);
+            console.log("telephone", telephone);
+            console.log("address", address);
+
+        });
+        return !(senderName === "" || telephone === "" || address === "");
+    }
+
+    function doExpress() {
+        $.showLoading("正在跳转...");
+        $("#slidder").load("/express/doExpressUI");
+        // $.hideLoading("...");
+    }
+
+    function createNewOrder() {
+        if (!hasSelectedExpress()) {
+            $.alert("收件人信息填写不完全,请填写后下单", 3000);
+            doExpress();
+            return;
+        }
+        $.showLoading("创建订单中...");
+        let itemList = $(".weui-cells.weui-cells_checkbox.middle");
+        let goods_list = [];
+        itemList.each(function (index, item) {
+            let status = $(item).find(".weui-check").val();
+            if (status === "on") {
+                let goods_id = $(item).data("goods_id");
+                goods_list.push({
+                    goods_id: goods_id,
+                    quantity: $(item).find(".weui-count__number").val(),
+                    goods: {
+                        price: parseFloat($(item).find(".weui-cell__bd p").text()),
+                    },
+                });
+                console.log(goods_id);
+            }
+        });
+        $.ajax({
+            url: "/order/save",
+            dataType: "json",
+            contentType: "application/json",
+            method: "post",
+            async: false,
+            data: JSON.stringify({
+                "itemList": goods_list,
+                "openId": sessionStorage.getItem("openId"),
+            })
+        }).done(function (res) {
+            $.hideLoading();
+            if (res.state === 1) {
+                $.toast("订单创建成功");
+                let order_id = res.data.order_id;
+                $("#slidder").data("order_id", order_id).load("/order/doOrderToPayUI");
+            } else {
+                $.toast(res.message, "forbidden");
+            }
+        })
+    }
+
+
+    function getSelectedIntegral() {
+        let sum = 0.0;
+        $(".weui-cells.weui-cells_checkbox.middle").each(function (index, item) {
+            let fuck = $(this).find(".weui-check").val();
+            if (fuck === "on") {
+                let integral = parseFloat($(item).find(".weui-cell__bd p").text());
+                // console.log("integral", integral);
+                let amount = $(item).find(".weui-count__number").val();
+                // console.log("amount", amount);
+                sum += parseFloat((integral * amount).toFixed(2));
+                // console.log("really", integral * amount);
+                // console.log("sum", sum);
+            }
+        });
+        $(".current_integral_Nb").text(sum.toFixed(2) + "元");
+        let text = parseFloat($(".my_integral_Nb").text());
+        let balance = (text - sum).toFixed(2);
+        $(".rest_integral_Nb").text((balance) + "元");
+    }
+
+    function getReservation() {
+        $.ajax({
+            url: "/getByOpenId",
+            method: "get",
+            data: {
+                openId: sessionStorage.getItem("openId"),
+            }
+        }).done(function (res) {
+            $(".my_integral_Nb").text(res.data.integral + "元");
+        })
+    }
+
+    function getCart() {
+        let openId = sessionStorage.getItem("openId");
+        $.showLoading("正在加载...");
+        $.ajax({
+            url: "/cart/get",
+            method: "get",
+            data: {
+                openId: openId,
+            }
+        }).done(function (res) {
+            if (res.state === 1) {
+                renderCartBody(res.data.records, renderCountControlPanel);
+                $.hideLoading();
+            }
+        })
+    }
+
+    function checkBoxChecked() {
+        $(this).val() === "on" ? $(this).val("off") : $(this).val("on");
+        let weui_cell_checkbox = $(this).parent().parent().parent();
+        weui_cell_checkbox.data("checked", $(this).val());
+        getSelectedIntegral();
+    }
+
+    var MAX = 99, MIN = 1;
+
+    function decreaseBtnClicked() {
+        let weui_check_middle = $(this).parent().parent().parent().parent().parent().parent();
+        let val = weui_check_middle.find(".weui-check").val();
+        if (val === "off") {
+            return;
+        }
+        let count_number = parseFloat($(this).parent().find(".weui-count__number").val());
+        let newCount = count_number - 1;
+        if ((newCount) < MIN) {
+            newCount = MIN;
+        }
+        let price = parseFloat($(this).parent().parent().prev().find("p").text());
+        $(this).parent().find(".weui-count__number").val(newCount);
+        weui_check_middle.data("itemPrice", price * newCount);
+        console.log("fuck", weui_check_middle.data("itemPrice"));
+        getSelectedIntegral();
+    }
+
+
+    function increaseBtnClicked() {
+        let weui_check_middle = $(this).parent().parent().parent().parent().parent().parent();
+        let val = weui_check_middle.find(".weui-check").val();
+        if (val === "off") {
+            return;
+        }
+        let count_number = parseFloat($(this).parent().find(".weui-count__number").val());
+        let newCount = count_number + 1;
+        if ((newCount) > MAX) {
+            newCount = MAX;
+        }
+        let price = parseFloat($(this).parent().parent().prev().find("p").text());
+        $(this).parent().find(".weui-count__number").val(newCount);
+        weui_check_middle.data("itemPrice", price * newCount);
+        console.log("fuck", weui_check_middle.data("itemPrice"));
+        getSelectedIntegral();
+    }
+
+    function renderCountControlPanel() {
+        getReservation();
+    }
+
+    function renderCartBody(records, callback) {
+        let bg = $(".bg");
+        records.forEach(function (item) {
+            let weui_checkbox = $("<div class='weui-cells weui-cells_checkbox middle'></div>");
+            weui_checkbox.data("cartItemId", item.id);
+            weui_checkbox.data("goods_id", item.goods.goods_id);
+            let label = $("<label class='checkbox'>");
+            let weui_cell_hd = $("<div class='weui-cell__hd'>");
+            let weui_check = $("<input type='checkbox' class='weui-check'>");
+            weui_check.val("off");
+            weui_check.on("click", checkBoxChecked);
+            weui_cell_hd.append(weui_check);
+            let i = $("<i class='weui-icon-checked'>");
+            weui_cell_hd.append(weui_check);
+            weui_cell_hd.append(i);
+            label.append(weui_cell_hd);
+            weui_checkbox.append(label);
+
+            let weui_cell_bdcart_list = $("<div class='weui-cell__bdcart_List'>");
+            let list_img = $("<div class='list_Img'>");
+            let img = $("<img/>");
+            img.attr("src", item.goods.cover_img);
+            list_img.append(img);
+
+            weui_cell_bdcart_list.append(list_img);
+            let list_detail = $("<div class='list_detail'>");
+            let list_type = $("<div class='list_type'>");
+            let name = $("<div class='name'>");
+            name.text(item.goods.goods_name);
+            list_type.append(name);
+            let g = $("<div class='g'>500g</div>");
+            list_type.append(g);
+            list_detail.append(list_type);
+            let weui_cell = $("<div class='weui-cell'>");
+            let weui_cell_bd = $("<div class='weui-cell__bd'>");
+            let integral_p = $("<p style='font-size: small'/>");
+            integral_p.text(item.goods.price + "元");
+            weui_cell_bd.append(integral_p);
+            weui_cell.append(weui_cell_bd);
+            let weui_cell_ft = $("<div class='weui-cell__ft'>");
+            let weui_count = $("<div class='weui-count'>");
+            let decreaseBtn = $("<a class='weui-count__btn weui-count__decrease'>");
+            decreaseBtn.on("click", decreaseBtnClicked);
+            weui_count.append(decreaseBtn);
+            let weui_count_number = $("<input class='weui-count__number' type='number'>");
+            weui_count_number.val(item.quantity);
+            weui_count.append(weui_count_number);
+            let increaseBtn = $("<a class='weui-count__btn weui-count__increase'>");
+            increaseBtn.on("click", increaseBtnClicked);
+            weui_count.append(increaseBtn);
+            weui_cell_ft.append(weui_count);
+            weui_cell.append(weui_cell_ft);
+            list_detail.append(weui_cell);
+            weui_cell_bdcart_list.append(list_detail);
+            weui_checkbox.append(weui_cell_bdcart_list);
+            bg.append(weui_checkbox);
+        });
+        callback();
+    }
+</script>

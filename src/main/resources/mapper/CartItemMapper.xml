@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC
+        "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.interconn.demo.Dao.CartItemDao">
+    <delete id="deleteObject" parameterType="list">
+        delete from cart_item where id in
+        <foreach collection="list" item="item" index="index" separator="," open="(" close=")">
+            #{item}
+        </foreach>
+    </delete>
+    <select id="findObjectByOpenIdAndGoodsId" resultType="CartItem">
+        select id,
+               openId,
+               quantity,
+               cart_id,
+               status,
+               createdTime,
+               createdUser,
+               modifiedTime,
+               modifiedUser,
+               goods_id
+        from cart_item
+        where goods_id = #{goods_id}
+          and openId = #{openId}
+    </select>
+    <insert id="saveObject" parameterType="CartItem">
+        insert into cart_item (id, openId, goods_id, quantity, cart_id, status, createdTime, createdUser,
+                               modifiedTime, modifiedUser)
+        values (default, #{openId}, #{goods_id}, #{quantity}, #{cart_id}, 1, now(), #{createdUser}, default, default)
+    </insert>
+
+    <update id="updateObject" parameterType="CartItem">
+        update cart_item
+        <set>
+            <if test="quantity != null">
+                quantity = #{quantity},
+            </if>
+            <if test="status != null">
+                status = #{status},
+            </if>
+            modifiedTime = #{modifiedTime},
+            modifiedUser = #{modifiedUser}
+        </set>
+        where id = #{id}
+    </update>
+
+    <select id="getRowCount" resultType="int">
+        select count(*)
+        from cart_item
+        <where>
+            <if test="openId != null and openId != ''">
+                openId = #{openId}
+            </if>
+        </where>
+    </select>
+
+    <resultMap id="GoodsInCartItemMap" type="CartItem">
+        <id property="id" column="id"/>
+        <result property="openId" column="openId"/>
+        <result property="goods_id" column="goods_id"/>
+        <result property="quantity" column="quantity"/>
+        <result property="cart_id" column="cart_id"/>
+        <result property="status" column="status"/>
+        <result property="createdTime" column="createdTime"/>
+        <result property="createdUser" column="createdUser"/>
+        <association property="goods" javaType="Goods">
+            <result property="goods_id" column="goods_id"/>
+            <result property="goods_name" column="goods_name"/>
+            <result property="price" column="price"/>
+            <result property="cover_img" column="cover_img"/>
+        </association>
+    </resultMap>
+    <select id="findPageObjects" resultMap="GoodsInCartItemMap">
+        select i.id,
+        openId,
+        i.goods_id,
+        quantity,
+        cart_id,
+        i.status,
+        i.createdTime,
+        i.createdUser,
+        i.modifiedTime,
+        i.modifiedUser,
+        g.goods_name,
+        g.price,
+        g.cover_img
+        from cart_item i inner join goods g on i.goods_id = g.goods_id
+        where openId = #{openId}
+        order by i.createdTime desc
+        <if test="startIndex != null and pageSize != null">
+            limit #{startIndex},#{pageSize}
+        </if>
+    </select>
+
+</mapper>

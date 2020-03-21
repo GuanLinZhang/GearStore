@@ -1,0 +1,301 @@
+<div class="card shadow mb-4">
+  <div class="card-header py-3">
+    <h6 class="m-0 font-weight-bold text-primary">类别管理</h6>
+    <!--        <form action="" class="search_list_parent">-->
+    <!--            <input type="search" class="search_list_search" >-->
+    <!--            <input type="button" value="搜索" class="search_list_btn">-->
+    <!--        </form>-->
+    <button class='btn btn-success' id="addCategory_list">
+      <!--                data-toggle='modal' data-target='#exampleModal2'-->
+      添加类别
+    </button>
+  </div>
+  <div class="card-body">
+    <div class="table-responsive">
+      <table class="table">
+        <thead>
+        <tr>
+          <th scope="col" id="id">编号</th>
+          <th scope="col" id="username">类别</th>
+          <th scope="col" id="createdUser">创建人</th>
+          <th scope="col" id="createdTime">创建时间</th>
+          <th scope="col" id="modifiedUser">修改人</th>
+          <th scope="col" id="modifiedTime">修改时间</th>
+          <th scope="col" id="status">当前状态</th>
+          <th scope="col" style="padding-left:20px;">操作</th>
+          <th scope="col" style="padding-left:32px; "></th>
+        </tr>
+        </thead>
+        <tbody>
+        <!--                <tr id="number">-->
+        <!--                </tr>-->
+        </tbody>
+      </table>
+      <!--                    分页-->
+      <!--            <div id="pageId" class="box-footer clearfix">-->
+      <!--                <ul class="pagination justify-content-center">-->
+      <!--                    <li class="page-item"><a class="first page-link">首页</a></li>-->
+      <!--                    <li class="page-item"><a class="pre page-link">上一个</a></li>-->
+      <!--                    <li class="page-item"><a class="next page-link">下一个</a></li>-->
+      <!--                    <li class="page-item"><a class="last page-link">尾页</a></li>-->
+      <!--                    <li class="page-item"><a class="rowCount page-link"></a></li>-->
+      <!--                    <li class="page-item"><a class="pageCount page-link"></a></li>-->
+      <!--                    <li class="page-item"><a class="pageCurrent page-link"></a></li>-->
+      <!--                </ul>-->
+      <!--            </div>-->
+
+    </div>
+  </div>
+  <link rel="stylesheet" href="../css/list.css">
+  <link href="/admin/vendor/datatables/dataTables.bootstrap4.min.css" rel="stylesheet">
+  <script src="https://cdn.bootcss.com/twitter-bootstrap/4.3.1/js/bootstrap.min.js"></script>
+
+  <!--        更改按钮的弹出框-->
+  <!--        <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal" data-whatever="@mdo" style="width: 10%; ">修改密码</button>-->
+  <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+       aria-hidden="false">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">修改</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <form>
+            <div class="form-group">
+              <label for="recipient-name" class="col-form-label">类名:</label>
+              <input type="text" class="form-control" id="category_name">
+            </div>
+            <!--                            <div class="form-group">-->
+            <!--                                <label for="message-text" class="col-form-label">密码:</label>-->
+            <!--                                <input type="text" class="form-control" id="NewpassWord">-->
+            <!--                            </div>-->
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">取消修改</button>
+          <button type="button" class="btn btn-primary" id="determineChange">确认修改</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!--           添加类别的弹出框-->
+  <div class="modal fade" id="exampleModal2" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+       aria-hidden="false">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="addExampleModalLabel">添加类别</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <form>
+            <div class="form-group">
+              <label for="addCategory_name" class="col-form-label">类名:</label>
+              <input type="text" class="form-control" id="addCategory_name">
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">取消添加</button>
+          <button type="button" class="btn btn-primary" id="Category_nameAdd">确认添加</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+    /**请求当前页*/
+    $(function () {     // 当页面加载时请求当前页
+        doFindObject();   //当点击侧栏按钮执行此函数
+        $("#determineChange").on("click", updateAdmin);   //修改
+        $("#Category_nameAdd").on("click", addCategory_list);
+        $("#addCategory_list").on("click", showAddCategory);
+    });
+
+    function showAddCategory() {
+        $("#addCategory_name").val("");
+        $("#exampleModal2").modal("show");
+    }
+
+    // function doUpdateCategoryModal() {
+    //     $("#category_name").val("");
+    //     $("#exampleModal1").modal("show");
+    // }
+
+    /**类别的删除操作:*/
+    function deleteBtnClicked() {
+        let id = $(this).parent().parent().children(":first").text(); //拿到对应的id
+        console.log("delete", id);
+        if (confirm("确认删除吗?")) {
+            $.ajax({
+                url: "/category/delete",
+                method: "delete",
+                data: {
+                    id: id,
+                }
+            }).done(function (result) {
+                if (result.state === 1) {
+                    doFindObject();
+                }
+            })
+        }
+    }
+
+    /**当点击侧栏按钮执行此函数*/
+    function doFindObject() {
+        // var pageCurrent = $("#pageId").data("pageCurrent");  //给PageId附上属性pageCurrent
+        // if (!pageCurrent) pageCurrent = 1;    //如果pageCurrent为null,则证明为此时当前页
+        $.ajax({
+            url: "/category/getAll",
+            method: "get",
+            // data: {
+            //     pageCurrent: pageCurrent,
+            // },
+        }).done(function (result) {
+            console.log("result", result);
+            if (result.state === 1) {
+                // 显示数据
+                doRender(result.data);
+                // 设置分页
+                // setPagination(result.data);
+            }
+        })
+    }
+
+    /**类别动态列表渲染*/
+    function doRender(records) {
+        let tbody = $("tbody");
+        tbody.empty();
+        records.forEach(function (item, index, array) {
+            for (let i in item) {
+                if (!item[i]) {
+                    item[i] = "暂无";
+                }
+            }
+            let tr = $("<tr>");
+
+            let id_td = $("<td>");
+            id_td.text(item.id);
+            tr.append(id_td);
+
+            let username_td = $("<td>");
+            username_td.text(item.category_name);
+            tr.append(username_td);
+
+            let createdUser_td = $("<td>");
+            createdUser_td.text(item.createdUser);
+            tr.append(createdUser_td);
+
+            let createdTime_td = $("<td>");
+            createdTime_td.text(item.createdTime);
+            tr.append(createdTime_td);
+
+            let modifiedUser_td = $("<td>");
+            modifiedUser_td.text(item.modifiedUser);
+            tr.append(modifiedUser_td);
+
+            let modifiedTime_td = $("<td>");
+            modifiedTime_td.text(item.modifiedTime);
+            tr.append(modifiedTime_td);
+
+            let status_td = $("<td>");
+            console.log(item.status)
+            status_td.text(item.status == "暂无" ? "已删除" : "正常");
+            tr.append(status_td);
+
+            let button_td = $("<td>");
+            let button = $("<button class='btn btn-info'>修改</button>");
+            button.on("click", changeName);
+            button_td.append(button);
+            // button.attr("data-toggle", "modal");
+            // button.attr("data-target", "#exampleModal");
+            // button.attr("placeholder","item.username");
+            tr.append(button_td);
+
+            let delete_td = $("<td>");
+            let delete_button = $("<button class='btn btn-danger'>删除类别</button>");
+            if (item.status == "暂无") {
+                delete_button.attr("disabled", true);
+                button.attr("disabled", true);
+            }
+            delete_td.append(delete_button);
+            delete_button.on("click", deleteBtnClicked);
+            tr.append(delete_td);
+
+            tbody.append(tr);
+        })
+    }
+
+    /**类别的修改操作:*/
+    function changeName() {
+        $("#category_name").val("");
+        // $("#NewpassWord").val("");
+        var userName = $(this).parent().parent().children(":first").next().text();  //为了让弹出框的value默认为用户名
+        console.log(userName);
+        // console.log("哈哈哈这是",userName);
+        $("#category_name").val(userName);
+        var id = $(this).parent().parent().children(":first").text(); //拿到对应的id
+        $(".modal-dialog").data("id", id);
+        $("#exampleModal").modal("show");
+    }
+
+    function updateAdmin() {
+        console.log("id", $(".modal-dialog").data("id"));
+        var id = $(".modal-dialog").data("id")
+        var category_name = $("#category_name").val();   //拿到input里面新的用户名
+        if (category_name == "") {
+            alert("类名不能为空");
+            return;
+        }
+        $.ajax({                  // 把拿到的新数据发送给服务器,再拿回服务器返回的数据,如果成功则重新渲染页面
+            url: "/category/update",
+            method: "put",
+            data: {
+                id: id,
+                category_name: category_name,
+            }
+        }).done(function (result) {
+            console.log("修改请求", result);
+            // $(this).attr('placeholder',"result.username");
+            if (result.state === 1) {
+                $(".modal-backdrop.fade.show").removeClass("show");
+                $(".modal.fade.show").removeClass("show");
+                alert("修改成功!!");
+                doFindObject();
+            }
+            $("#exampleModal").modal("hide");
+        })
+    }
+
+    /**添加类别*/
+    function addCategory_list() {
+        var category_name = $("#addCategory_name").val();
+        if (category_name === "") {
+            alert("类别不能为空");
+            return;
+        }
+        $.ajax({
+            url: "/category/save",
+            method: "post",
+            data: {
+                category_name: category_name,
+            }
+        }).done(function (result) {
+            console.log("拿到被添加的数据", result);
+            if (result.state === 1) {
+                alert("添加成功");
+                $("#exampleModal2").modal("hide");
+            }
+            doFindObject();
+
+        })
+    }
+
+
+</script>

@@ -1,0 +1,203 @@
+<link rel="stylesheet" href="css/goods.css">
+<link rel="stylesheet" href="css/my.css">
+
+<!--用户头像,姓名,电话,地址等-->
+<div class="head">
+  <div class="user_info">
+    <div class="user_header">
+      <img src="img/head.png">
+    </div>
+    <div class="user_details">
+      <div class="user_name">
+        <div class="name"></div>
+        <div class="phone_number"></div>
+      </div>
+      <div class="user_home"></div>
+    </div>
+  </div>
+  <!--  按钮-->
+  <a class="weui-btn select_btn" id="doExpr">
+    <p>收货地址</p>
+  </a>
+</div>
+
+<!--当前余额-->
+<div class="present_consumption">  <!--当前消费-->
+  <div class="present_integral" ;>
+    <div class="describe">
+      当前余额:
+    </div>
+    <div class="integral">
+    </div>
+  </div>
+  <div class="statement" id="statement">
+    <a>消费明细&nbsp;&gt;</a>
+  </div>
+</div>
+
+<!--热门推荐-->
+<div class="recommend_body">
+  <div class="recommend">热门推荐</div>
+</div>
+<div class="weui-tab__bd">
+  <!--    蔬菜水果区详情-->
+  <div id="tab1" class="weui-tab__bd-item weui-tab__bd-item--active">
+    <!--        <div class="vg_Body">-->
+    <!--            <div class="ve_Img">-->
+    <!--                <img class="ve_Img_img">-->
+    <!--            </div>-->
+    <!--            <div class="ve_info">-->
+    <!--                <div class="ve_Number">-->
+    <!--                    <div class="ve_detail">-->
+    <!--                        <div class="ve_type">西红柿</div>-->
+    <!--                        <div class="ve_g">500g</div>-->
+    <!--                    </div>-->
+    <!--                    <div class="vg_integral">-->
+    <!--                        <div class="vg_point">-->
+    <!--                            兑换点数:-->
+    <!--                        </div>-->
+    <!--                        <div class="vg_point_number">-->
+    <!--                            8-->
+    <!--                        </div>-->
+    <!--                    </div>-->
+    <!--                </div>-->
+    <!--                <div class="ve_cart">-->
+    <!--                    <a href="#"><img src="img/addcart3.png"></a>-->
+    <!--                </div>-->
+    <!--            </div>-->
+    <!--        </div>-->
+  </div>
+</div>
+<script>
+    $(function () {
+        var headImg = sessionStorage.getItem("headImg");
+        $(".user_header img").attr("src", headImg);
+
+        var cityName = sessionStorage.getItem("nickName");
+        $(".name").text(cityName);
+
+
+        $("#statement").on("click", function () {
+            $("#slidder").load("/doTransDetail");
+        });
+        $("#doExpr").on("click", function () {
+            $("#slidder").load("/doExpressUI");
+        });
+        // 热门推荐
+        $.showLoading("正在加载中...");
+        recommend();
+        getProfile();
+        getIntegral();
+    });
+
+    function getProfile() {
+        let openId = sessionStorage.getItem("openId");
+        $.ajax({
+            url: "/express/get",
+            method: "get",
+            data: {
+                openId: openId,
+                is_selected: 1,
+            }
+        }).done(function (res) {
+            let data = res.data[0];
+            $(".user_home").text(data.address);
+            $(".phone_number").text(data.telephone);
+            $.hideLoading();
+        })
+    }
+
+    function getIntegral() {
+        let openId = sessionStorage.getItem("openId");
+        $.ajax({
+            url: "/getByOpenId",
+            method: "get",
+            data: {
+                openId: openId,
+            }
+        }).done(function (res) {
+            $(".integral").text(res.data.integral);
+        })
+    }
+
+    function recommend() {
+        $.ajax({
+            url: "/goods/get",
+            method: "get",
+            data: {
+                isRecommended: 1,
+            }
+        }).done(function (res) {
+            res.data.records.forEach(function (item) {
+                let table = $("#tab1");
+
+                let vg_Body = $("<div class='vg_Body'></div>");
+                vg_Body.empty();
+                vg_Body.data("goods_id", item.goods_id);
+
+                table.append(vg_Body);
+                let ve_Img = $("<div class='ve_Img'></div>");
+                let img = $("<img >");
+                img.attr("src", item.cover_img);
+                vg_Body.append(ve_Img);
+                ve_Img.append(img);
+
+                let ve_info = $("<div class='ve_info'></div>");
+                let ve_Number = $("<div class='ve_Number'></div>");
+
+                let ve_detail = $("<div class='ve_detail'></div>");
+                vg_Body.append(ve_info);
+                ve_info.append(ve_Number);
+                ve_Number.append(ve_detail);
+                let ve_type = $("<div class='ve_type'></div>");
+                ve_type.text(item.goods_name);
+                let ve_g = $("<div class='ve_g'></div>");
+                ve_g.text(item.price + "元/500g");
+                ve_detail.append(ve_type);
+                ve_detail.append(ve_g);
+
+                // let vg_integral = $("<div class='vg_integral'></div>");
+                // ve_Number.append(vg_integral);
+                // let vg_point = $("<div class='vg_point'>单价</div>");
+                // let vg_point_number = $("<div class='vg_point_number'></div>");
+                // vg_point_number.text(item.price + "元");
+                // vg_integral.append(vg_point);
+                // vg_integral.append(vg_point_number);
+
+                let ve_cart = $("<div class='ve_cart'></div>");
+                ve_info.append(ve_cart);
+
+                let a = $("<a>");
+                a.on("click", joinCart);
+                ve_cart.append(a);
+                let cart_img = $("<img>");
+                cart_img.attr("src", "img/addcart3.png");
+                a.append(cart_img);
+            });
+        });
+    }
+
+    // 加入购物车
+    function joinCart() {
+        var openId = sessionStorage.getItem("openId");
+        var goods_id = $(this).parent().parent().parent().data("goods_id");
+        console.log("goods_id", goods_id);
+        $.ajax({
+            url: "/cart/add",
+            method: "post",
+            data: {
+                openId: openId,
+                goods_id: goods_id,
+                quantity: 1,
+            }
+        }).done(function (res) {
+            if (res.state === 1) {
+                $.toptip('添加成功', 2000, 'success');
+            }
+        })
+    }
+</script>
+
+
+
+

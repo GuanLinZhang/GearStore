@@ -1,0 +1,299 @@
+<link rel="stylesheet" href="../css/list.css">
+<link rel="stylesheet" href="../css/orderList.css">
+<link href="/admin/vendor/datatables/dataTables.bootstrap4.min.css" rel="stylesheet">
+<div class="card shadow mb-4">
+  <div class="card-header py-3">
+    <h6 class="m-0 font-weight-bold text-primary">微信用户管理</h6>
+    <form action="" class="search_list_parent">
+      <input type="text" class="search_list_search" id="searchUserName">
+      <input type="button" value="搜索" id="searchUser" class="search_list_btn" onclick="doSearch()">
+    </form>
+  </div>
+  <div class="card-body">
+    <div class="table-responsive">
+      <table class="table">
+        <thead>
+        <tr>
+          <th scope="col">微信号</th>
+          <th scope="col">头像</th>
+          <th scope="col">昵称</th>
+          <th scope="col">首次登陆时间</th>
+          <th scope="col">修改时间</th>
+          <th scope="col">所在地</th>
+          <th scope="col">余额</th>
+          <th scope="col">更改余额</th>
+        </tr>
+        </thead>
+        <tbody>
+        </tbody>
+      </table>
+      <!--                    分页-->
+      <div id="pageId" class="box-footer clearfix" style="cursor: pointer">
+        <ul class="pagination justify-content-center">
+          <li class="page-item"><a class="first page-link">首页</a></li>
+          <li class="page-item"><a class="pre page-link">上一个</a></li>
+          <li class="page-item"><a class="next page-link">下一个</a></li>
+          <li class="page-item"><a class="last page-link">尾页</a></li>
+          <li class="page-item"><a class="rowCount page-link"></a></li>
+          <li class="page-item"><a class="pageCount page-link"></a></li>
+          <li class="page-item"><a class="pageCurrent page-link"></a></li>
+        </ul>
+      </div>
+
+    </div>
+  </div>
+
+  <!--    更改商品按钮的弹出框-->     <!--  更改:商品名   封面图   单价-->
+  <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+       aria-hidden="false">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">修改用户余额</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <form>
+            <div class="form-group">
+              <label for="openId" class="col-form-label">微信ID:</label>
+              <input type="text" class="form-control" id="openId" disabled>
+            </div>
+            <div class="form-group">
+              <label for="integral" class="col-form-label">余额:</label>
+              <input type="text" class="form-control" id="integral">
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">取消修改</button>
+          <button type="button" class="btn btn-primary" id="determineChange">确认修改</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<script src="https://cdn.bootcss.com/twitter-bootstrap/4.3.1/js/bootstrap.min.js"></script>
+<script>
+    $(function () {
+        doFindObject();
+        $(".clearfix").on("click", ".first,.pre,.next,.last", doJumpToPage);
+        $("#determineChange").on("click", updateWechatUser);
+    });
+
+    /**分页页面跳转*/
+    function doJumpToPage() {
+        var pageCurrent = $("#pageId").data("pageCurrent");
+        var pageCount = $("#pageId").data("pageCount");
+        var cls = $(this).prop("class");
+        //console.log(cls);
+        if (cls === "first page-link") {
+            pageCurrent = 1;
+        }
+        if (cls === "pre page-link" && pageCurrent > 1) {
+            pageCurrent--;
+        }
+        if (cls === "next page-link" && pageCurrent < pageCount) {
+            pageCurrent++;
+        }
+        if (cls === "last page-link") {
+            pageCurrent = pageCount;
+        }
+        $("#pageId").data("pageCurrent", pageCurrent);
+        doFindObject();
+    }
+
+    /**分页渲染*/
+    function setPagination(pageObject) {
+        $("#pageId").data("pageCurrent", pageObject.pageCurrent);
+        $("#pageId").data("pageCount", pageObject.pageCount);
+
+        $(".rowCount").html("总记录数(" + pageObject.rowCount + ")");
+        $(".pageCount").html("总页数(" + pageObject.pageCount + ")");
+        $(".pageCurrent").html("当前页(" + pageObject.pageCurrent + ")");
+
+    }
+
+    /**当点击侧栏按钮执行此函数*/
+    function doFindObject() {
+        var pageCurrent = $("#pageId").data("pageCurrent");  //给PageId附上属性pageCurrent
+        if (!pageCurrent) pageCurrent = 1;    //如果pageCurrent为null,则证明为此时当前页
+        $.ajax({
+            url: "/get",
+            method: "get",
+            data: {
+                pageCurrent: pageCurrent,
+            },
+        }).done(function (result) {
+            console.log("result", result);
+            if (result.state === 1) {
+                // 显示数据
+                doRender(result.data.records);
+                // 设置分页
+                setPagination(result.data);
+            }
+        })
+    }
+
+    function updateWechatUser() {
+        if (confirm("确认更新吗?")) {
+            let openId = $(".modal-dialog").data("openId");
+            let integral = $("#integral").val();
+            $.ajax({
+                url: "/update",
+                method: "put",
+                data: {
+                    openId: openId,
+                    integral: integral,
+                    modifiedUser: sessionStorage.getItem("user"),
+                },
+            }).done(function (result) {
+                if (result.state === 1) {
+                    alert(result.message);
+                    // $.ajax({
+                    //     url: "/get",
+                    //     method: "get",
+                    //     data: {
+                    //         openId: openId,
+                    //         modifiedUser: sessionStorage.getItem("user"),
+                    //     }
+                    // }).done(function (result) {
+                    //     if (result.state === 1) {
+                    //         let record = result.data.records[0];
+                    //         $("#openId").val(record.openId);
+                    //         $("#integral").val(record.integral);
+                    //         // $('.modal-content').remove();
+                    //         // $('.modal-content').modal('hide');
+                    //     }
+                    // })
+                } else {
+                    alert(result.message);
+                }
+                doFindObject();
+            }).fail(function (result) {
+                alert("服务器异常");
+            });
+        }
+        $('#exampleModal').modal('hide')
+    }
+
+    /**动态列表渲染*/
+    function doRender(records) {
+        let tbody = $("tbody");
+        tbody.empty();
+        records.forEach(function (item) {
+            for (let i in item) {
+                if (!item[i]) {
+                    item[i] = "暂无";
+                }
+            }
+            let tr = $("<tr>");
+
+            let id_td = $("<td>");
+            id_td.text(item.openId);
+            tr.append(id_td);
+
+
+            let headImg_td = $("<td>");      // 此处添加照片,得有一个框来装照片
+            headImg_td.css("width", "88px");
+            headImg_td.css("vertical-align", "unset");
+            let img = $("<img>");
+            img.css("width", "100%");
+            img.css("border-radius", "10px");
+            img.attr("src", item.headImg);
+            headImg_td.append(img);
+            tr.append(headImg_td);
+
+            let nickName = $("<td>");
+            nickName.text(item.nickName);
+            tr.append(nickName);
+
+            let createdTime_td = $("<td>");
+            createdTime_td.text(item.createdTime);
+            tr.append(createdTime_td);
+
+            // let modifiedUser_td = $("<td>");
+            // modifiedUser_td.text(item.modifiedUser);
+            // tr.append(modifiedUser_td);
+
+            let modifiedTime_td = $("<td>");
+            modifiedTime_td.text(item.modifiedTime);
+            tr.append(modifiedTime_td);
+
+            let location_td = $("<td>");
+            location_td.text(item.province + " " + item.cityName);
+            tr.append(location_td);
+
+            let personal_integral_td = $("<td>");
+            personal_integral_td.text(item.integral);
+            tr.append(personal_integral_td);
+
+            let integral_td = $("<td>");
+            integral_td.text(item.integral);
+
+            let button_td = $("<td>");
+            let button = $("<button class='btn btn-info'>修改</button>");
+            button.on("click", doDetail);
+            button.attr("data-toggle", "modal");
+            button.attr("data-target", "#exampleModal");
+            // console.log($(button)[0]);
+            button_td.append(button);
+            tr.append(button_td);
+
+            tbody.append(tr);
+        })
+    }
+
+    /**商品的修改操作:*/
+    function doDetail() {
+        $("#openId").val("");
+        $("#integral").val("");
+        let btn = $(this);
+        btn.text("加载中");
+        var openId = $(this).parent().parent().children(":first").text();  //为了让弹出框的value默认为用户名
+        $.ajax({
+            url: "/get",
+            method: "get",
+            data: {
+                openId: openId
+            }
+        }).done(function (result) {
+            btn.text("详情");
+            if (result.state == 1) {
+                $("#openId").val(openId);
+                let record = result.data.records[0];
+                $("#integral").val(record.integral);
+            }
+        });
+        $(".modal-dialog").data("openId", openId);
+    }
+
+    function doSearch() {
+        let fuzzyName = $("#searchUserName").val();
+        if (fuzzyName === '') {
+            doFindObject();
+            return;
+        }
+        let pageElem = $("#pageId");
+        let pageCurrent = pageElem.data("pageCurrent") == null ? 1 : pageElem.data("pageCurrent");
+        $.ajax({
+            url: "/get",
+            method: "get",
+            data: {
+                nickName: fuzzyName,
+                pageCurrent: pageCurrent,
+            }
+        }).done(function (result) {
+            let records = result.data.records;
+            if (records.length === 0) {
+                alert("不存在记录,即将返回列表");
+                $("#searchOrderName").val("");
+                doFindObject();
+                return;
+            }
+            doRender(records);
+        })
+
+    }
+</script>

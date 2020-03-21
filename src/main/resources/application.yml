@@ -1,0 +1,68 @@
+# 指定端口号
+server:
+  port: 8080
+#  servlet:
+#    context-path: /inter_connect
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://114.116.41.242:3306/app?useUnicode=true&characterEncoding=utf8
+    username: root
+    password: 123456
+    druid:
+      # 初始化大小，最小，最大
+      initialSize: 5
+      minIdle: 5
+      maxActive: 20
+      # 配置获取连接等待超时的时间
+      maxWait: 60000
+      # 配置监控统计拦截的filters，去掉后监控界面sql无法统计，'wall'用于防火墙
+      filters: stat,wall,slf4j
+      # 打开PSCache，并且指定每个连接上PSCache的大小
+      poolPreparedStatements: true
+      maxOpenPreparedStatements: 20
+      validationQuery: SELECT 1 FROM DUAL
+      testWhileIdle: true
+      testOnBorrow: false
+      testOnReturn: false
+      timeBetweenEvictionRunsMillis: 60000
+      minEvictableIdleTimeMillis: 300000
+      # yml方式配置servlet与filter
+      stat-view-servlet:
+        enabled: true
+        # /druid登录账号
+        login-username: admin
+        # /druid登录密码
+        login-password: admin
+        reset-enable: false
+      web-stat-filter:
+        enabled: true
+        exclusions: /druid/*,*.js,*.gif,*.jpg,*.png,*.css,*.ico
+        url-pattern: /*
+  #  redis:
+  #    database: 0
+  #    host: 127.0.0.1
+  #    port: 6379
+  #    password:
+  #    lettuce:
+  #      pool:
+  #        max-active: 8
+  #        max-wait: -1
+  #        max-idle: 8
+  #        min-idle: 0
+  #    timeout: 10000
+  servlet:
+    multipart:
+      max-request-size: 10485760
+      max-file-size: 10485760
+      enabled: true
+
+mybatis:
+  mapper-locations: classpath*:mapper/*.xml  #注意：一定要对应mapper映射xml文件的所在路径
+  type-aliases-package: com.interconn.demo.Entity  # 注意：对应实体类的路径
+
+logging:
+  level:
+    com.interconn.demo.Dao: trace
+  file: inter.log
+  path: /log

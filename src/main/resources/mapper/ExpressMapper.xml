@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC
+        "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.interconn.demo.Dao.ExpressDao">
+    <select id="findAllExpress" parameterType="Express" resultType="Express">
+        select
+        openId, address, telephone, post_code, is_selected, status, id,sender_name
+        from express
+        where
+        openId = #{openId}
+        <if test="is_selected != null">
+            and is_selected = #{is_selected}
+        </if>
+    </select>
+    <select id="findExpressByOpenId" parameterType="String" resultType="Express">
+        select openId,
+               address,
+               telephone,
+               post_code,
+               is_selected,
+               status,
+               id,
+               sender_name
+        from express
+        where openId = #{openId}
+          and is_selected = 1
+    </select>
+    <insert id="saveNewExpress" parameterType="Express">
+        insert into express (openId, address, telephone, post_code, is_selected, status, id, sender_name)
+        values (#{openId}, #{address}, #{telephone}, #{post_code}, 1, 1, default, #{sender_name});
+    </insert>
+
+    <update id="setDefaultExpress">
+        update express
+        set is_selected = 1
+        where openId = #{openId}
+          and id = #{id};
+    </update>
+
+    <delete id="deleteExpress" parameterType="integer">
+        delete
+        from express
+        where id = #{id}
+    </delete>
+
+    <update id="removeDefaultExpress" parameterType="String">
+        update express
+        set is_selected = 0
+        where openId = #{openId};
+    </update>
+
+    <update id="updateExpress" parameterType="Express">
+        update express
+        <set>
+            sender_name = #{sender_name},
+            address = #{address},
+            telephone = #{telephone},
+            post_code = #{post_code},
+        </set>
+        where openId = #{openId} and is_selected = 1
+    </update>
+</mapper>

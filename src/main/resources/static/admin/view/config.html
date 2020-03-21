@@ -1,0 +1,67 @@
+<div class="card shadow mb-4">
+    <div class="card-header py-3">
+        <h6 class="m-0 font-weight-bold text-primary">微信设置</h6>
+    </div>
+    <div class="card-body">
+        <div style="width: 30%;margin: 0 auto;">
+            <div class="input-group mb-3">
+                <div class="input-group-prepend">
+                    <span class="input-group-text" id="basic-addon1">AppID</span>
+                </div>
+                <input type="text" class="form-control" id="ID" placeholder="请输入AppID" aria-label="Username" aria-describedby="basic-addon1">
+            </div>
+            <div class="input-group mb-3">
+                <div class="input-group-prepend">
+                    <span class="input-group-text" id="basic-addon2">AppSecret</span>
+                </div>
+                <input type="text" class="form-control" id="secret" placeholder="请输入AppSecret" aria-label="Username" aria-describedby="basic-addon1">
+            </div>
+        </div>
+    </div>
+    <div>
+        <button type="button" class="btn btn-success" style="margin: 10px;position: relative; float: right" id="btn" >设置</button>
+    </div>
+    <link rel="stylesheet" href="../css/list.css">
+    <link href="/admin/vendor/datatables/dataTables.bootstrap4.min.css" rel="stylesheet">
+    <script src="https://cdn.bootcss.com/twitter-bootstrap/4.3.1/js/bootstrap.min.js"></script>
+</div>
+<script>
+    $(function () {
+        doFindObject();
+        $("#btn").on("click",setApp)
+    })
+    function doFindObject() {
+        $.ajax({
+            url:"/wechatConfig/get",
+            method:"get",
+        }).done(function (result) {
+          $("#ID").val(result.data.appId);
+          $("#secret").val(result.data.appSecret);
+        })
+    }
+    function setApp() {
+       var ID = $("#ID").val();
+       var secret = $("#secret").val();
+       if (ID == "" || secret == ""){
+           alert("AppID和Appsecrect不能为空!");
+           return;
+       }
+       $.ajax({
+           url:"/wechatConfig/set",
+           method: "put",
+           data:{
+               appId:ID,
+               appSecret:secret,
+           }
+       }).done(function (result) {
+            if (result.state == 1){
+                alert("设置成功!")
+            } else {
+                alert("设置失败!")
+            }
+           doFindObject();
+       })
+    }
+
+</script>
+

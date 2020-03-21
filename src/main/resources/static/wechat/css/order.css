@@ -1,0 +1,203 @@
+/*最大div*/
+#bg{
+    width: 94%;
+    margin: 10px;
+    background: none;
+    height: 100%;
+    overflow-y: auto;
+}
+.weui-cells{
+    display: flex;
+    flex-direction: column;
+    padding: 15px;
+    border-radius: 10px;
+}
+.middle{
+    border-radius: 10px;
+}
+/*label所在的div */
+.weui-cell, .myLabel{
+    width: 86.7%;
+}
+.weui-cell{
+    display: flex;
+    justify-content: center;
+}
+
+.weui-cell__bdcart_List{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    padding: 0 10px 0px 0;
+    margin-top: 10px;
+    border-bottom: 1px solid #ececec;
+    width: 100%;
+}
+/*购物车详情*/
+.cart_List{
+
+}
+.list_Img{
+    width: 38%;
+    margin-right: 5%;
+}
+.list_Img img{
+    width: 100%;
+    /*height: 70px;*/
+    border-radius: 6px;
+}
+.list_detail{
+    display: flex;
+    flex-direction:column;
+    align-items: baseline;
+    padding-top: 15px;
+    width: 50%;
+}
+.list_type{
+    display: flex;
+    flex-direction: row;
+    margin-bottom: 10px;
+    flex-wrap: nowrap;
+    justify-content: space-between;
+    width: 100%;
+}
+.name{
+    /*margin-right: 55px;*/
+    font-weight: bold;
+}
+.integral{
+    /*margin-right: 60px;*/
+}
+.weui-cell__ft{
+    margin-left: 40px;
+}
+.weui-cell__bd  p{
+    color: #04BE02;
+}
+.weui-cell:before{
+    border-top: 0;
+}
+
+/*预定*/
+.reservation{
+    border: gray;
+    width: 100%;
+    height: 120px;
+    background-color: cornflowerblue;
+    position:fixed;
+    bottom:49.6px;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    background-color: white;
+    border-top: 1px solid #d9d9d9;
+    border-bottom: 1px solid #d9d9d9;
+}
+.Integral_Change{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    margin-left: 7%;
+}
+.select{
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    align-items: center;
+    margin-right: 7%;
+}
+.my_integral,.current_integral,.rest_integral{
+    display: flex;
+    flex-direction: row;
+}
+.current_integral,.rest_integral{
+    margin-top: 5px;
+}
+/*.select_btn{*/
+/*    width: 200%;*/
+/*    height: 200%;*/
+/*    position: absolute;*/
+/*    top: 0;*/
+/*    left: 0;*/
+/*    transform: scale(.5);*/
+/*    box-sizing: border-box;*/
+/*    border-radius: 10px;*/
+/*}*/
+/*积分颜色*/
+.my_integral_Nb,.current_integral_Nb{
+    color: #75c675;
+    margin-left: 10px;
+}
+.rest_integral_Nb{
+    color: red;
+    margin-left: 10px;
+}
+.consumption_results{
+    padding-top: 10px;
+}
+/*按钮*/
+.select_btn{
+    color: white;
+    background-color:#1aad19;
+    height: 35px;
+    width: 100px;
+    margin-left: 100px;
+}
+.select_btn p{
+    position: absolute;
+    top: -10%;
+    left: 27%
+}
+
+/*订单页:*/
+.order{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+}
+.order_time{
+    display: flex;
+    flex-direction: row;
+}
+.order_deal p{
+    color: #75c675;
+}
+.number{
+    margin-left: 60px;
+}
+.integral_number{
+    display: flex;
+    flex-direction: row;
+    margin-bottom: 10px;
+    flex-wrap: nowrap;
+    justify-content: space-between;
+    color: #6ebb6e;
+    width: 100%;
+}
+.g{
+    margin-left: 50px;
+}
+/*.消费积分和点击查看*/
+.consumption_results{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+}
+.consumption_integral{
+    display: flex;
+    flex-direction: row;
+}
+/*.weui-btn{*/
+/*    line-height:0;*/
+/*}*/
+/*.weui-btn_primary{*/
+/*    background-color: #65bf65;*/
+/*}*/
+.blank{
+    clear:both;
+    overflow:hidden;
+    display:block;
+}

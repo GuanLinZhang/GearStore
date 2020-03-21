@@ -1,0 +1,81 @@
+.head{
+    background-color: white;
+    padding: 15px;
+}
+.user_info{
+    display: flex;
+    flex-direction: row;
+}
+.user_header{
+    width: 25%;
+    margin-right: 5%;
+}
+
+.user_header img{
+    width: 100%;
+    border-radius: 7px;
+}
+
+.user_details{
+    display: flex;
+    flex-direction: column;
+    width: 75%;
+}
+.user_name{
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
+.name {
+    margin-right: 20%;
+}
+/*按钮*/
+.select_btn{
+    color:  #67c867;
+    background-color:white;
+    border: 1px solid  #67c867;
+    height: 35px;
+    width: 105px;
+    margin-right: 1%;
+    margin-top: 6px;
+    position: relative;
+}
+.select_btn p {
+    position: absolute;
+    top:-19%
+}
+
+/*当前积分*/
+.present_consumption{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    background-color: white;
+    border-radius: 10px;
+    width: 93%;
+    margin: 1.4%;
+    padding: 2%;
+    margin-top: 10px;
+}
+.present_integral{
+    display: flex;
+    flex-direction: row;
+}
+.statement a{
+    color:  #67c867;
+}
+/*推荐*/
+.recommend_body{
+    padding-left: 11.875px;
+}
+.recommend{
+    margin-top: 10px;
+    font-weight: 600;
+    padding-left: 5%;
+    border-left: 4px solid #67c867;
+}
+.weui-tab__bd{
+    box-sizing: border-box;
+    height: 100%;
+    background-color: #ececec;
+}

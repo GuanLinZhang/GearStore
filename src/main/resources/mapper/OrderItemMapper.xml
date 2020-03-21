@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC
+        "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.interconn.demo.Dao.OrderItemDao">
+    <select id="findObject" resultType="OrderItem">
+        select i.id,
+        i.order_id,
+        quantity,
+        item_price,
+        i.createdTime,
+        i.createdUser,
+        i.modifiedUser,
+        i.modifiedTime,
+        i.status,
+        g.goods_id,
+        goods_name,
+        cover_img,
+        goods_desc,
+        price
+        from order_item i
+        inner join goods g on i.goods_id = g.goods_id
+        <where>
+            i.order_id = #{order_id}
+            <if test="status != null">
+                and status = #{status}
+            </if>
+        </where>
+        order by i.status desc,createdTime desc
+        <if test="startIndex != null and pageSize != null">
+            limit #{startIndex},#{pageSize}
+        </if>
+    </select>
+    <select id="findObjectByOrderId" resultType="OrderItem" parameterType="string">
+        select i.id,
+               i.goods_id,
+               order_id,
+               quantity,
+               item_price,
+               i.createdTime,
+               i.createdUser,
+               i.modifiedUser,
+               i.modifiedTime,
+               i.status,
+               g.goods_name,
+               g.goods_desc,
+               g.cover_img,
+               g.price
+        from order_item i
+                 inner join goods g on i.goods_id = g.goods_id
+        where order_id = #{order_id}
+    </select>
+
+    <insert id="saveObjects" parameterType="list">
+        insert into order_item (id, goods_id, order_id, quantity, item_price,createdTime, createdUser, modifiedUser,
+        modifiedTime, status)
+        values
+        <foreach collection="list" item="item" separator="," index="index">
+            (default,#{item.goods_id},#{item.order_id},#{item.quantity},#{item.item_price},now(),#{item.createdUser},default,default,1)
+        </foreach>
+
+    </insert>
+
+    <delete id="deleteObjects" parameterType="String">
+        delete
+        from order_item
+        where order_id = #{order_id}
+    </delete>
+</mapper>

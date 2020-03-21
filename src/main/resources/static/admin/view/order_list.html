@@ -1,0 +1,466 @@
+<link rel="stylesheet" href="../css/list.css">
+<link rel="stylesheet" href="../css/orderList.css">
+<link href="/admin/vendor/datatables/dataTables.bootstrap4.min.css" rel="stylesheet">
+<div class="card shadow mb-4">
+  <div class="card-header py-3">
+    <h6 class="m-0 font-weight-bold text-primary">订单管理</h6>
+    <div class="search_list_parent">
+      <input type="text" class="search_list_search" id="searchOrderName">
+      <input type="button" value="搜索" id="searchOrder" class="search_list_btn" onclick="doSearch()">
+    </div>
+  </div>
+  <div class="card-body">
+    <div class="table-responsive">
+      <table class="table">
+        <thead>
+        <tr>
+          <th scope="col" id="id">订单编号</th>
+          <th scope="col" id="goodsName">发起人</th>
+          <th scope="col" id="wechatUser">微信昵称</th>
+          <th scope="col" id="Price">总价</th>
+          <th scope="col" id="coverImg">支付状态</th>
+          <th scope="col" id="createdTime">创建时间</th>
+          <th scope="col" id="modifiedTime">修改时间</th>
+          <th scope="col" id="status">当前状态</th>
+          <th scope="col" style="padding-left:20px;">详情</th>
+          <th scope="col" style="padding-left:20px;">处理</th>
+          <th scope="col" style="padding-left:32px; ">驳回</th>
+        </tr>
+        </thead>
+        <tbody>
+        </tbody>
+      </table>
+      <!--                    分页-->
+      <div id="pageId" class="box-footer clearfix" style="cursor: pointer">
+        <ul class="pagination justify-content-center">
+          <li class="page-item"><a class="first page-link">首页</a></li>
+          <li class="page-item"><a class="pre page-link">上一个</a></li>
+          <li class="page-item"><a class="next page-link">下一个</a></li>
+          <li class="page-item"><a class="last page-link">尾页</a></li>
+          <li class="page-item"><a class="rowCount page-link"></a></li>
+          <li class="page-item"><a class="pageCount page-link"></a></li>
+          <li class="page-item"><a class="pageCurrent page-link"></a></li>
+        </ul>
+      </div>
+
+    </div>
+  </div>
+
+  <!--    更改商品按钮的弹出框-->     <!--  更改:商品名   封面图   单价-->
+  <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+       aria-hidden="false">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">预览/修改订单</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <form>
+            <div class="form-group">
+              <label for="order_id" class="col-form-label">订单编号:</label>
+              <input type="text" class="form-control" id="order_id" disabled>
+            </div>
+            <div class="form-group">
+              <label for="total_price" class="col-form-label">总价:</label>
+              <input type="text" class="form-control" id="total_price">
+            </div>
+            <label for="address" class="col-form-label">地址:</label>
+            <div class="input-group form-group">
+              <input type="text" id="address" class="form-control">
+            </div>
+            <label for="contact" class="col-form-label">联系人:</label>
+            <div class="input-group form-group">
+              <input type="text" id="contact" class="form-control">
+            </div>
+            <label for="telephone" class="col-form-label">电话:</label>
+            <div class="input-group form-group">
+              <input type="text" id="telephone" class="form-control">
+            </div>
+            <label class="col-form-label">详细:</label>
+            <div class="form-group">
+              <ul class="list-group" id="itemList">
+                <!--                <li class="list-group-item justify-content-between align-items-center">-->
+                <!--                  Cras justo odio-->
+                <!--                  <span class="badge badge-info">小计: </span>-->
+                <!--                  <span class="badge badge-danger">数量: 3</span>-->
+                <!--                  <span class="badge badge-primary">单价: 14元 / 500g</span>-->
+                <!--                </li>-->
+              </ul>
+            </div>
+
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">取消修改</button>
+          <button type="button" class="btn btn-primary" id="determineChange">确认修改</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<script src="https://cdn.bootcss.com/twitter-bootstrap/4.3.1/js/bootstrap.min.js"></script>
+
+<script>
+    $(function () {
+        // 当页面加载时请求当前页
+        doFindObject();
+        $(".clearfix").on("click", ".first,.pre,.next,.last", doJumpToPage);
+        $("#determineChange").on("click", updateOrder);
+        // $("#determineAdd").on("click", saveGoods);
+        // renderCategory();
+    });
+
+    /**分页渲染*/
+    function setPagination(pageObject) {
+        $("#pageId").data("pageCurrent", pageObject.pageCurrent);
+        $("#pageId").data("pageCount", pageObject.pageCount);
+
+        $(".rowCount").html("总记录数(" + pageObject.rowCount + ")");
+        $(".pageCount").html("总页数(" + pageObject.pageCount + ")");
+        $(".pageCurrent").html("当前页(" + pageObject.pageCurrent + ")");
+
+    }
+
+    function updateOrder() {
+        if (confirm("确认更新吗?")) {
+            let orderId = $(".modal-dialog").data("order_id");
+            $.ajax({
+                url: "/order/update",
+                method: "put",
+                data: {
+                    order_id: orderId,
+                    address: $("#address").val(),
+                    total_price: $("#total_price").val(),
+                    telephone: $("#telephone").val(),
+                    contact: $("#contact").val(),
+                }
+            }).done(function (result) {
+                if (result.state === 1) {
+                    alert(result.message);
+                    $.ajax({
+                        url: "/order/get",
+                        method: "get",
+                        data: {
+                            order_id: orderId
+                        }
+                    }).done(function (result) {
+                        console.log($(this)[0]);
+                        if (result.state === 1) {
+                            $("#order_id").val(orderId);
+                            let record = result.data.records[0];
+                            $("#total_price").val(record.total_price);
+                            $("#address").val(record.address);
+                            $("#telephone").val(record.telephone);
+                            $("#contact").val(record.contact);
+                            renderOrderItemList(record.orderItemList);
+                        }
+                    })
+                }
+                doFindObject();
+            }).fail(function (result) {
+                alert("服务器异常");
+            });
+        }
+    }
+
+    /**分页页面跳转*/
+    function doJumpToPage() {
+        var pageCurrent = $("#pageId").data("pageCurrent");
+        var pageCount = $("#pageId").data("pageCount");
+        var cls = $(this).prop("class");
+        //console.log(cls);
+        if (cls === "first page-link") {
+            pageCurrent = 1;
+        }
+        if (cls === "pre page-link" && pageCurrent > 1) {
+            pageCurrent--;
+        }
+        if (cls === "next page-link" && pageCurrent < pageCount) {
+            pageCurrent++;
+        }
+        if (cls === "last page-link") {
+            pageCurrent = pageCount;
+        }
+        $("#pageId").data("pageCurrent", pageCurrent);
+        doFindObject();
+    }
+
+    /**当点击侧栏按钮执行此函数*/
+    function doFindObject() {
+        var pageCurrent = $("#pageId").data("pageCurrent");  //给PageId附上属性pageCurrent
+        if (!pageCurrent) pageCurrent = 1;    //如果pageCurrent为null,则证明为此时当前页
+        $.ajax({
+            url: "/order/get",
+            method: "get",
+            data: {
+                pageCurrent: pageCurrent,
+            },
+        }).done(function (result) {
+            console.log("result", result);
+            if (result.state === 1) {
+                // 显示数据
+                doRender(result.data.records);
+                // 设置分页
+                setPagination(result.data);
+            }
+        })
+    }
+
+    function doExpress() {
+        let order_id = $(this).parent().parent().children(":first").text();  //为了让弹出框的value默认为用户名
+        if (confirm("确认处理吗?")) {
+            $.ajax({
+                url: "/order/update",
+                method: "put",
+                data: {
+                    order_id: order_id,
+                    status: 1
+                }
+            }).done(function (result) {
+                if (result.state == 1) {
+                    alert("已处理");
+                }
+                doFindObject();
+            })
+        }
+    }
+
+
+    /**动态列表渲染*/
+    function doRender(records) {
+        let tbody = $("tbody");
+        tbody.empty();
+        records.forEach(function (item, index, array) {
+            // for (let i in item) {
+            //     if (!item[i]) {
+            //         item[i] = "暂无";
+            //     }
+            // }
+            let tr = $("<tr>");
+
+            let id_td = $("<td>");
+            id_td.text(setTextOrEmpty(item.order_id));
+            tr.append(id_td);
+
+            let createdUserTd = $("<td>");
+            createdUserTd.text(setTextOrEmpty(item.createdUser));
+            tr.append(createdUserTd);
+
+            let wechatUserTd = $("<td>");
+            wechatUserTd.text(setTextOrEmpty(item.user.nickName));
+            tr.append(wechatUserTd);
+            let totalPriceTd = $("<td>");
+            totalPriceTd.text(item.total_price);
+            tr.append(totalPriceTd);
+
+            let isPaidTd = $("<td>");
+            tr.data("is_paid", item.is_paid);
+            if (item.is_paid === 1) {
+                isPaidTd.text("已支付");
+                isPaidTd.css("color", "green");
+            } else {
+                isPaidTd.text("待支付");
+                isPaidTd.css("color", "#fb8c00");
+            }
+            tr.append(isPaidTd);
+
+            let createdTime_td = $("<td>");
+            createdTime_td.text(setTextOrEmpty(item.createdTime));
+            tr.append(createdTime_td);
+
+            // let modifiedUser_td = $("<td>");
+            // modifiedUser_td.text(item.modifiedUser);
+            // tr.append(modifiedUser_td);
+
+            let modifiedTime_td = $("<td>");
+            modifiedTime_td.text(setTextOrEmpty(item.modifiedTime));
+            tr.append(modifiedTime_td);
+
+            let status_td = $("<td>");
+            console.log(item.status);
+            tr.data("status", item.status);
+            if (item.status === 0) {
+                if (item.is_paid === 0) {
+                    status_td.text("待支付后处理");
+                    status_td.css("color", "red");
+                } else {
+                    status_td.text("待处理");
+                    status_td.css("color", "red");
+                }
+            } else if (item.status === -1) {
+                status_td.text("已驳回");
+                status_td.css("color", "grey");
+            } else {
+                status_td.text("已处理");
+                status_td.css("color", "green");
+            }
+            tr.append(status_td);
+
+
+            let button_td = $("<td>");
+            let button = $("<button class='btn btn-info'>详情</button>");
+            button.on("click", doDetail);
+            button.attr("data-toggle", "modal");
+            button.attr("data-target", "#exampleModal");
+            console.log($(button)[0]);
+            button_td.append(button);
+            tr.append(button_td);
+
+            let express_td = $("<td><button class='btn btn-success'>处理</button>");
+            let express_btn = $(express_td).find("button");
+            console.log(item.status);
+            if (item.status === 1) {
+                express_btn.text("已处理");
+                express_btn.attr("disabled", "disabled");
+            }
+            express_btn.on("click", doExpress);
+            tr.append(express_td);
+            let delete_td = $("<td>");
+            let delete_button = $("<button class='btn btn-danger'>驳回</button>");
+            if (item.status === -1) {
+                delete_button.attr("disabled", true);
+                // button.attr("disabled", true);
+                express_btn.attr("disabled", true);
+            }
+            if (item.is_paid !== 1) {
+                express_btn.attr("disabled", "disabled");
+            }
+            delete_td.append(delete_button);
+            delete_button.on("click", deleteBtnClicked);
+            tr.append(delete_td);
+
+            tbody.append(tr);
+        })
+    }
+
+    function setTextOrEmpty(text) {
+        return !text ? "暂无" : text;
+    }
+
+
+    /**商品的修改操作:*/
+    function doDetail() {
+        let btn = $(this);
+        btn.text("加载中");
+        var order_id = $(this).parent().parent().children(":first").text();  //为了让弹出框的value默认为用户名
+        console.log("orderid", order_id);
+        $.ajax({
+            url: "/order/get",
+            method: "get",
+            data: {
+                order_id: order_id
+            }
+        }).done(function (result) {
+            console.log($(this)[0]);
+            btn.text("详情");
+            if (result.state == 1) {
+                $("#order_id").val(order_id);
+                let record = result.data.records[0];
+                $("#total_price").val(record.total_price);
+                $("#address").val(record.address);
+                $("#telephone").val(record.telephone);
+                $("#contact").val(record.contact);
+                renderOrderItemList(record.orderItemList);
+            }
+        });
+        $(".modal-dialog").data("order_id", order_id);
+        doFindObject();
+    }
+
+
+    function renderOrderItemList(data) {
+        let orderItem = $("#itemList");
+        orderItem.empty();
+        data.forEach(function (item) {
+            let li = $("<li class='list-group-item justify-content-between align-items-center'>");
+            let goods_name = item.goods_name;
+            li.text(goods_name);
+            let itemPrice = $("<span class='badge badge-info'>");
+            itemPrice.text("小计: " + item.item_price);
+            li.append(itemPrice);
+            let quantity = $("<span class='badge badge-danger'>");
+            quantity.text("数量: " + item.quantity);
+            li.append(quantity);
+            let price = $("<span class='badge badge-warning'>");
+            price.text("单价: " + item.price + "元/500g");
+            li.append(price);
+            orderItem.append(li);
+        })
+    }
+
+    function deleteBtnClicked() {
+        let tr = $(this).parent().parent();
+        let order_id = tr.children(":first").text(); //拿到对应的id
+        let totalPrice = tr.children("td").eq(3).text();  //为了让弹出框的value默认为用户名
+        console.log("totalPrice", totalPrice);
+        let user = tr.children("td").eq(1).text();  //为了让弹出框的value默认为用户名
+        let status = tr.data("status");
+        let is_paid = tr.data("is_paid");
+        if (confirm("确认驳回订单编号: " + order_id + "的订单么?")) {     //confirm的调用
+            $.ajax({
+                url: "/order/update",
+                method: "put",
+                data: {
+                    order_id: order_id,
+                    status: -1,
+                }
+            }).done(function (result) {
+                if (result.state === 1) {
+                    // alert("驳回成功,正返回用户" + user + "元中...");
+                    if (is_paid === 1) {
+                        $.ajax({
+                            url: "/order/doPayBack",
+                            method: "put",
+                            data: {
+                                order_id: order_id,
+                                totalPrice: totalPrice,
+                            }
+                        }).done(function (res) {
+                            if (res.state === 1) {
+                                alert("驳回成功,已返回给用户: " + user + totalPrice + "元!");
+                            } else {
+                                alert(result.message);
+                            }
+                        })
+                    }
+                    alert("驳回成功");
+                } else {
+                    alert(result.message);
+                }
+                doFindObject();
+            })
+        }
+    }
+
+    function doSearch() {
+        let fuzzyName = $("#searchOrderName").val();
+        if (fuzzyName === '') {
+            alert("查询用户为空");
+            doFindObject();
+            return;
+        }
+        let pageElem = $("#pageId");
+        let pageCurrent = pageElem.data("pageCurrent") == null ? 1 : pageElem.data("pageCurrent");
+        $.ajax({
+            url: "/order/get",
+            method: "get",
+            data: {
+                createdUser: fuzzyName,
+                pageCurrent: pageCurrent,
+            }
+        }).done(function (result) {
+            let records = result.data.records;
+            if (records.length === 0) {
+                alert("不存在记录,即将返回列表");
+                $("#searchOrderName").val("");
+                doFindObject();
+                return;
+            }
+            doRender(records);
+        })
+
+    }
+</script>

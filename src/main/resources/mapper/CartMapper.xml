@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC
+        "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.interconn.demo.Dao.CartDao">
+    <resultMap id="CartItemGoodsMap" type="GoodsInCart">
+        <result property="cartItemId" column="cartItem_id"/>
+        <result property="openId" column="openId"/>
+        <result property="goods_id" column="goods_id"/>
+        <result property="quantity" column="quantity"/>
+        <result property="price" column="price"/>
+        <result property="cover_img" column="cover_img"/>
+        <result property="createdTime" column="createdTime"/>
+        <result property="createdUser" column="createdUser"/>
+        <result property="modifiedTime" column="modifiedTime"/>
+        <result property="modifiedUser" column="modifiedUser"/>
+    </resultMap>
+    <select id="getCartItemByOpenId" resultMap="CartItemGoodsMap">
+        SELECT i.id as cartItem_id,
+               i.openId,
+               i.createdTime,
+               i.createdTime,
+               i.modifiedUser,
+               i.modifiedTime,
+               i.quantity,
+               g.goods_id,
+               g.goods_name,
+               g.goods_desc,
+               g.cover_img,
+               g.price
+        FROM cart_item i
+        INNER JOIN goods g
+        ON i.goods_id = g.goods_id
+        WHERE i.openId = #{openId}
+        order by i.createdTime desc
+    </select>
+
+</mapper>

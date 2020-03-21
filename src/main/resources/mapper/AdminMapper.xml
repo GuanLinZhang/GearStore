@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC
+        "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.interconn.demo.Dao.AdminDao">
+    <select id="getUserByUsernamePassword" resultType="Admin" parameterType="Admin">
+        select * from admin where username = #{username} and password = #{password}
+        <choose>
+            <when test="status != 0">
+                and status = #{status}
+            </when>
+            <otherwise>
+                and status = 1
+            </otherwise>
+        </choose>
+    </select>
+
+    <select id="findPageObjects" resultType="Admin">
+        select
+        id, username, createdTime, createdUser, modifiedUser, modifiedTime, status
+        from admin
+        <where>
+            <if test="username != null and username != ''">
+                username like concat('%',#{username},'%')
+            </if>
+        </where>
+        order by status desc,createdTime desc
+        limit #{startIndex},#{pageSize}
+    </select>
+
+    <select id="getRowCount" parameterType="string" resultType="int">
+        select count(*) from admin
+        <where>
+            <if test="username != null and username !=''">
+                username like concat('%',#{username},'%')
+            </if>
+        </where>
+    </select>
+
+    <delete id="deleteObjects" parameterType="string">
+        delete from admin where id in
+        <foreach collection="ids" open="(" close=")" separator=","
+                 item="item">
+            ${item}
+        </foreach>
+    </delete>
+
+    <update id="deleteObjectsLogicallyById" parameterType="string">
+        update admin set status = 0 where id in
+        <foreach collection="ids" open="(" close=")" separator="," item = "item">
+            ${item}
+        </foreach>
+    </update>
+
+    <update id="updateByNameOrID" parameterType="Admin">
+        update admin set status = 0
+        where
+        <if test="id != null and id != ''">
+            id = #{id}
+        </if>
+        <if test="username != null and username != ''">
+            and username = #{username}
+        </if>
+    </update>
+
+    <insert id="saveObject" parameterType="Admin">
+        insert into admin(id, username, password, createdTime, createdUser, modifiedUser, modifiedTime, status)
+        values(default,#{username},#{password},now(),#{createdUser},#{modifiedUser},#{modifiedTime},1)
+    </insert>
+
+    <update id="updateObject" parameterType="Admin">
+        update admin
+        <set>
+            <if test="username != null and username != ''">username = #{username},</if>
+            <if test="password != null and password != ''">password = #{password},</if>
+            <if test="modifiedUser != null and modifiedUser != ''">modifiedUser = #{modifiedUser},</if>
+            modifiedTime = now()
+            where
+            <if test="id != null and id != ''">id = #{id}</if>
+        </set>
+    </update>
+
+    <select id="findObjectById" parameterType="int" resultType="Admin">
+        select
+        id, username, password, createdTime, createdUser, modifiedUser, modifiedTime, status
+        from admin
+        <where>
+            <if test="id != null and id != ''">id = #{id}</if>
+        </where>
+    </select>
+
+
+</mapper>

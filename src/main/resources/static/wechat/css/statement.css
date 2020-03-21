@@ -1,0 +1,31 @@
+.statement_all {
+    display: flex;
+    flex-direction: column;
+    border-bottom: 1px solid #8080802e;
+    padding-bottom: 10px;
+    margin: 10px;
+}
+
+.statement {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+.amount {
+    color: #ffa500bd;
+    font-weight: 600;
+}
+
+.statement_detail {
+    display: flex;
+    flex-direction: row;
+    margin-bottom: 6px;
+}
+
+.statement_time {
+    display: flex;
+    flex-direction: row;
+    color: #9e9e9eb5;
+    font: menu;
+}

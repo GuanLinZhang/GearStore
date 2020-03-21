@@ -1,0 +1,343 @@
+<!--查看订单-->
+<link rel="stylesheet" href="css/order2paid.css">
+<link rel="stylesheet" href="css/order.css">
+<div class="head">
+  <div class="user_details">
+    <div class="user_name">
+      <div id="sender_name" class="name"></div>
+      <div class="phone_number"></div>
+    </div>
+    <div class="user_home"></div>
+  </div>
+  <div style="margin-left: 10%;width: 20%">
+    <a style="width: 100%" id="doExpressDetail"><img src="img/arrow%20.png"
+                                                     style="width: 100%;height: 20%;margin-left: 30px;"></a>
+  </div>
+</div>
+<!--订单信息-->
+<!--<div class="weui-cells">-->
+<!--  &lt;!&ndash;        订单时间和处理状态&ndash;&gt;-->
+<!--  <div class="order">-->
+<!--    <div class="order_time">-->
+<!--      <div class="order_describe">订单日期:</div>-->
+<!--      <div class="order_detail">2019-09-18</div>-->
+<!--    </div>-->
+<!--  </div>-->
+<!--  &lt;!&ndash;        商品框&ndash;&gt;-->
+<!--  <div class="weui-cell__bdcart_List">-->
+<!--    <div class="list_Img">-->
+<!--      <img src="img/text_fruits.png" alt="图片">-->
+<!--    </div>-->
+<!--    <div class="list_detail">-->
+<!--      <div class="list_type">-->
+<!--        <div class="name">西红柿</div>-->
+<!--        <div class="g">500g</div>-->
+<!--      </div>-->
+<!--      <div class="integral_number">-->
+<!--        <div class="integral">8积分</div>-->
+<!--        <div class="number">&times 2</div>-->
+<!--      </div>-->
+<!--    </div>-->
+<!--  </div>-->
+<!--  <div class="weui-cell__bdcart_List">-->
+<!--    <div class="list_Img">-->
+<!--      <img src="img/text_fruits.png" alt="图片">-->
+<!--    </div>-->
+<!--    <div class="list_detail">-->
+<!--      <div class="list_type">-->
+<!--        <div class="name">西红柿</div>-->
+<!--        <div class="g">500g</div>-->
+<!--      </div>-->
+<!--      <div class="integral_number">-->
+<!--        <div class="integral">8积分</div>-->
+<!--        <div class="number">&times 2</div>-->
+<!--      </div>-->
+<!--    </div>-->
+<!--  </div>-->
+<!--  <div class="weui-cell__bdcart_List">-->
+<!--    <div class="list_Img">-->
+<!--      <img src="img/text_fruits.png" alt="图片">-->
+<!--    </div>-->
+<!--    <div class="list_detail">-->
+<!--      <div class="list_type">-->
+<!--        <div class="name">西红柿</div>-->
+<!--        <div class="g">500g</div>-->
+<!--      </div>-->
+<!--      <div class="integral_number">-->
+<!--        <div class="integral">8积分</div>-->
+<!--        <div class="number">&times 2</div>-->
+<!--      </div>-->
+<!--    </div>-->
+<!--  </div>-->
+<!--  &lt;!&ndash;        消费积分和点击查看&ndash;&gt;-->
+<!--  <div class="consumption_results">-->
+<!--    <div class="consumption_integral">-->
+<!--      <div class="all_consumption">共消费积分:</div>-->
+<!--      <div class="number_consumption">22</div>-->
+<!--    </div>-->
+<!--  </div>-->
+<!--</div>-->
+<!--确认和撤销订单-->
+<div class="button">
+  <button href="#" id="btn1" class="weui-btn weui-btn_primary select_btn" style="line-height: 0">
+    支付订单
+  </button>
+  <button href="#" id="btn2" class="weui-btn weui-btn_warn select_btn" style="line-height: 0">
+    撤销订单
+  </button>
+</div>
+<!--<script src="https://cdn.bootcss.com/moment.js/2.24.0/moment.js"></script>-->
+<script>
+    console.log($("#slidder").data("order_id"));
+    $(function () {
+        $.showLoading();
+        renderHead();
+        getOrderDetail();
+        $("#btn1").on("click", payOrder);
+        $("#btn2").on("click", deleteOrder);
+        $("#doExpressDetail").on("click", doExpress);
+    });
+
+    function doExpress() {
+        $.showLoading("正在跳转...");
+        $("#slidder").load("/express/doExpressUI");
+        // $.hideLoading("...");
+    }
+
+    function deleteOrder() {
+        //如果参数过多，建议通过 object 方式传入
+        $.confirm({
+            title: '确认撤销?',
+            text: '您确定要撤销订单么?',
+            onOK: function () {
+                $.showLoading("撤销订单中...");
+                let cell_status = $(".weui-cells").data("status");
+                console.log("status", cell_status);
+                let cell_is_paid = $(".weui-cells").data("is_paid");
+                console.log("is_paid", cell_is_paid);
+                if (cell_status === 0 && cell_is_paid === 1) {
+                    let totalPrice = $(".weui-cells").data("total_price");
+                    console.log("totalPrice", totalPrice);
+                    // $.showLoading("正返还:" + totalPrice + "积分中...");
+                    $.ajax({
+                        url: "/order/doPayBack",
+                        method: "put",
+                        async: false,
+                        data: {
+                            order_id: $("#slidder").data("order_id"),
+                            totalPrice: totalPrice,
+                        }
+                    }).done(function (res) {
+                        $.hideLoading();
+                        if (res.state === 1) {
+                            // $.toast("");
+                            $.toast("返还" + totalPrice + "元");
+                        } else {
+                            $.toast(res.message, "cancel");
+                        }
+                    })
+                }
+                // $.showLoading("撤回订单中...");
+                $.ajax({
+                    url: "/order/delete",
+                    method: "delete",
+                    data: {
+                        order_id: $("#slidder").data("order_id"),
+                    }
+                }).done(function (res) {
+                    $.hideLoading();
+                    if (res.state === 1) {
+                        $.toast("撤回成功,返回订单列表");
+                    } else {
+                        $.toast(res.message, "cancel");
+                    }
+                });
+                $("#order_tabbar").trigger("click");
+            }
+        })
+
+    }
+
+    function payOrder() {
+        let senderName = $("#sender_name").text();
+        let phoneNum = $(".phone_number").text();
+        let address = $(".user_home").text();
+        if (senderName.includes("")) {
+            $.confirm({
+                title: '确认支付么?',
+                text: '您确定要支付订单么?',
+                onOK: function () {
+                    $.showLoading("正在支付...");
+                    $.ajax({
+                        url: "/order/pay",
+                        method: "post",
+                        async: false,
+                        data: {
+                            order_id: $("#slidder").data("order_id"),
+                            openId: sessionStorage.getItem("openId"),
+                        }
+                    }).done(function (res) {
+                        $.hideLoading();
+                        if (res.state === 1) {
+                            $.toast("支付成功");
+                            $("#order_tabbar").trigger("click");
+                        } else {
+                            $.toast(res.message, "cancel");
+                        }
+                    })
+                },
+            });
+        }
+    }
+
+    function renderHead() {
+        $.showLoading("正在加载快递信息...");
+        $.ajax({
+            url: "/express/get",
+            method: "get",
+            async: false,
+            data: {
+                openId: sessionStorage.getItem("openId"),
+                is_selected: 1,
+            }
+        }).done(function (res) {
+            let result = res.data[0];
+            console.log(result);
+            let senderName = result.sender_name;
+            let telephone = result.telephone;
+            let address = result.address;
+            if (senderName === "" || telephone === "" || address === "") {
+                $("#btn1").hide();
+                $.alert("收货地址/电话/联系人不完整,请填写后再下单");
+                if (senderName === "") {
+                    senderName = "暂无";
+                }
+                if (telephone === "") {
+                    telephone = "暂无";
+                }
+                if (address === "") {
+                    address = "暂无";
+                }
+            }
+            $("#sender_name").text("收货人姓名: " + senderName);
+            $(".phone_number").text("联系电话: " + telephone);
+            $(".user_home").text("收货地址: " + address);
+            $.hideLoading();
+        })
+    }
+
+    function renderOrderDetail(records) {
+        records.forEach(function (item) {
+            let weui_cells = $("<div class='weui-cells' />");
+            weui_cells.data("order_id", item.order_id);
+            let order = $("<div class='order'>");
+            let order_time = $("<div class='order_time'>");
+            let order_desc = $("<div class='order_describe'>");
+            order_desc.text("订单日期: ");
+            order_time.append(order_desc);
+            let order_detail = $("<div class='order_detail'>");
+            order_time.append(order_detail);
+            // let date = moment(item.createdTime).format('YYYY-MM-DD');
+            let date = item.createdTime;
+            console.log(date);
+            console.log(item);
+            order_detail.text(date);
+            order.append(order_time);
+            let order_deal = $("<div class='order_deal'>");
+            let p = $("<p>");
+            if (item.status === -1) {
+                p.text("已驳回");
+                p.css({
+                    "color": "#b2b2b2",
+                    "font-weight": 1000,
+                });
+                $("#btn1").hide();
+            } else {
+                if (item.is_paid === 1) {
+                    if (item.status === 1) {
+                        p.text("已处理");
+                        p.css({
+                            "color": "#09bb07",
+                            "font-weight": 1000,
+                        });
+                        $("#btn1").hide();
+                        $("#btn2").hide();
+                    } else {
+                        p.text("待处理");
+                        p.css({
+                            "color": "#ffbe00",
+                            "font-weight": 1000,
+                        });
+                        $("#btn1").hide();
+                    }
+                } else {
+                    p.text("待支付");
+                    p.css({
+                        "color": "#f76260",
+                        "font-weight": 1000,
+                    });
+                }
+            }
+            weui_cells.data("status", item.status);
+            weui_cells.data("is_paid", item.is_paid);
+            order_deal.append(p);
+            order.append(order_deal);
+            weui_cells.append(order);
+
+            item.orderItemList.forEach(function (subItem) {
+                let weui_cells__bdcart_list = $("<div class='weui-cell__bdcart_List'>");
+                let listImg = $("<div class='list_Img'>");
+                let img = $("<img />");
+                img.attr("src", subItem.cover_img);
+                listImg.append(img);
+                weui_cells__bdcart_list.append(listImg);
+                let list_detail = $("<div class='list_detail'>");
+                let list_type = $("<div class='list_type'>");
+                let name = $("<div class='name'>");
+                name.text(subItem.goods_name);
+                list_type.append(name);
+                list_type.append($("<div class='g'>500g</div>"));
+                list_detail.append(list_type);
+                let integral_number = $("<div class='integral_number'>");
+                let integral = $("<div class='integral'></div>");
+                integral.text(subItem.price + "元");
+                integral_number.append(integral);
+                let number = $("<div class='number'>");
+                number.text("x " + subItem.quantity);
+                integral_number.append(number);
+                list_detail.append(integral_number);
+                weui_cells__bdcart_list.append(list_detail);
+                weui_cells.append(weui_cells__bdcart_list);
+            });
+            let consumption_result = $("<div class='consumption_results'>");
+            let consumption_integral = $("<div class='consumption_integral'>");
+            let all_consumption = $("<div class='all_consumption'>共消费: </div>'");
+            consumption_integral.append(all_consumption);
+            let number_consumption = $("<div class='number_consumption'></div>");
+            number_consumption.text(item.total_price + "元");
+            weui_cells.data("total_price", item.total_price);
+            consumption_integral.append(number_consumption);
+            consumption_result.append(consumption_integral);
+            weui_cells.append(consumption_result);
+            $(".head").after(weui_cells)
+        })
+    }
+
+    function getOrderDetail() {
+        $.showLoading();
+        $.ajax({
+            url: "/order/get",
+            method: "get",
+            data: {
+                order_id: $("#slidder").data("order_id")
+            }
+        }).done(function (res) {
+            $.hideLoading();
+            if (res.state === 1) {
+                renderOrderDetail(res.data.records);
+            } else {
+                $.toast(res.message, "forbidden");
+            }
+        })
+    }
+</script>

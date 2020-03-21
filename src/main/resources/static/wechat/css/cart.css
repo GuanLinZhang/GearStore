@@ -1,0 +1,166 @@
+/*最大div*/
+.bg{
+    width: 94%;
+    margin: 10px;
+    background: none;
+    overflow-y: auto;
+    height: 82%;
+}
+/*包含label和详情的大div*/
+.weui-cells, .weui-cells_checkbox{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    margin-top: 10px;
+    width: 100%;
+}
+.checkbox{
+    width: 10%;
+}
+.middle{
+    border-radius: 10px;
+}
+/*label所在的div */
+.myLabel{
+    width: 86.7%;
+}
+.weui-cell{
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    margin-left: 10px;
+}
+
+.weui-cell__bdcart_List{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    padding: 10px 10px 10px 0;
+    width: 90%;
+}
+/*购物车详情*/
+.cart_List{
+
+}
+.list_Img{
+    width: 40%;
+    margin-right: 3%;
+}
+.list_Img img{
+    width: 100%;
+    /*height: 70px;*/
+    border-radius: 6px;
+}
+.list_detail{
+    display: flex;
+    flex-direction:column;
+    align-items: center;
+    padding-top: 8px;
+    width: 50%;
+}
+.list_type,.list_integral{
+    display: flex;
+    flex-direction: row;
+}
+.list_type{
+    margin-bottom: 5%;
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    margin-left: 10px;
+}
+.name{
+    margin-right: 55px;
+    font-weight: bold;
+}
+.g{
+    margin-right: 10%;
+}
+.integral{
+    margin-right: 60px;
+}
+.weui-cell__ft{
+    margin-left: 40px;
+}
+.weui-cell__bd  p{
+    color: #04BE02;
+}
+.weui-cell:before{
+border-top: 0;
+}
+
+/*预定*/
+.reservation{
+    border: gray;
+    width: 100%;
+    height: 15%;
+    background-color: cornflowerblue;
+    position:fixed;
+    bottom:49.6px;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    background-color: white;
+    border-top: 1px solid #d9d9d9;
+    border-bottom: 1px solid #d9d9d9;
+}
+.Integral_Change{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    /*align-items: center;*/
+    margin-left: 7%;
+}
+.select{
+    display: flex;
+    flex-direction: row;
+    align-items: baseline;
+}
+.select button{
+    margin-right: 20px;
+}
+.select_all{
+    margin-left: 30px;
+}
+.my_integral,.current_integral,.rest_integral{
+    display: flex;
+    flex-direction: row;
+}
+.current_integral,.rest_integral{
+    margin-top: 5px;
+}
+/*.select_btn{*/
+/*    width: 200%;*/
+/*    height: 200%;*/
+/*    position: absolute;*/
+/*    top: 0;*/
+/*    left: 0;*/
+/*    transform: scale(.5);*/
+/*    box-sizing: border-box;*/
+/*    border-radius: 10px;*/
+/*}*/
+/*积分颜色*/
+.my_integral_Nb,.current_integral_Nb{
+    color: #75c675;
+    margin-left: 10px;
+}
+.rest_integral_Nb{
+    color: red;
+    margin-left: 10px;
+}
+/*按钮*/
+.select_btn {
+    color: white;
+    background-color: #04BE02;
+    height: 40px;
+    width: 90px;
+}
+.select_btn p{
+    position: absolute;
+    left: 25%
+}
+.weui-btn{
+    line-height: 0;
+}
+

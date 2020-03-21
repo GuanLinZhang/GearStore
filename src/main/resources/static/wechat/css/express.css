@@ -1,0 +1,53 @@
+.address_goods,
+.address_door,
+.address_name {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    width: 100%;
+    padding: 3% 5%;
+    border-bottom: 1px solid #80808026;
+;
+}
+
+.goods_address {
+    display: flex;
+    flex-direction: row;
+}
+
+.click_address img {
+    width: 19px;
+    height: 19px;
+}
+
+.address_detail {
+    border: none;
+}
+
+.sex {
+    display: flex;
+    flex-direction: row;
+    padding: 3% 5%;
+    border-bottom: 1px solid #80808026;
+}
+
+.address_all button {
+    width: -webkit-fill-available;
+    padding: 5px;
+    margin: 20%;
+}
+
+.head_address {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    width: 100%;
+    padding: 3% 5%;
+    border-bottom: 1px solid #80808026;
+}
+
+.address_head {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px;
+}

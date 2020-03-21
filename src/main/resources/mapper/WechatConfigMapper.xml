@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC
+        "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.interconn.demo.Dao.WechatConfigDao">
+    <cache />
+    <select id="getWechatConfig" resultType="WechatConfig">
+        select appId, appSecret
+        from wx_config;
+    </select>
+    <update id="setWechatConfig" parameterType="WechatConfig">
+        update wx_config
+        set appId = #{appId}, appSecret = #{appSecret}
+    </update>
+</mapper>

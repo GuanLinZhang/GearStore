@@ -1,0 +1,93 @@
+根据前端所传参数,获得不同格式的商品列表
+url: "/goods/get"
+method: "get",
+data: {
+    pageCurrent: (用于分页,如不传此参数,默认返回全部列表)
+    goodsName: (可选,商品名称,用于模糊查询)
+    categoryId: (可选,商品类别Id,查询指定商品类别id下属全部商品)
+    status: (可选,如传入 status = 1 则只返回status = 1的商品,如不传,则status = 1 / 0 都将被返回)
+        isRecommended: (可选,如传入值为1,查询全部推荐商品列表)
+}
+返回json:{
+    "state": 1,
+    "message": "查询成功",
+    "data": [
+        {
+            "id": 1,
+            "goods_id": "e4f0e25eacdc4aba8712bf6cdb78b693",
+            "goods_name": "dwdw",
+            "goods_desc": "dwdw",
+            "cover_img": "dwdw",
+            "price": 3.15,
+            "createdUser": null,
+            "category_id": 2,
+            "createdTime": "2019-09-24 16:46:34",
+            "modifiedUser": null,
+            "modifiedTime": null,
+            "status": 1,
+            "isRecommended": null
+        }
+    ]
+}
+------------------------------------------------------------------------------------------------------------------------
+P.S. data中带* 表示必传 其他表示可选
+更新指定商品
+url: "/goods/update"
+method: "put"
+data: {
+    *id: 必传 商品id  不是goods_id !!!
+    category_id: 商品所属类别id
+    price: 单价
+    modifiedUser: 更改人
+    coverImg: 封面图片
+    goods_desc: 商品描述
+    status: 状态
+    isRecommended: 是否将其设为推荐  1: 设为推荐 0: 取消推荐
+}
+返回json:
+{
+    "state": 1,
+    "message": "更新成功",
+    "data": {
+        "id": 11,
+        "goods_id": null,
+        "goods_name": "自助",
+        "goods_desc": null,
+        "cover_img": null,
+        "price": 4.5,
+        "createdUser": null,
+        "category_id": 3,
+        "createdTime": null,
+        "modifiedUser": null,
+        "modifiedTime": null,
+        "status": null,
+        "isRecommended": null
+    }
+}
+------------------------------------------------------------------------------------------------------------------------
+删除指定商品
+url: "/goods/delete"
+method: "delete"
+data: {
+    "id": 指定id
+}
+返回json
+{
+    "state": 1,
+    "message": "删除成功",
+    "data": {
+        "id": 11,
+        "goods_id": null,
+        "goods_name": null,
+        "goods_desc": null,
+        "cover_img": null,
+        "price": null,
+        "createdUser": null,
+        "category_id": null,
+        "createdTime": null,
+        "modifiedUser": null,
+        "modifiedTime": null,
+        "status": null,
+        "isRecommended": null
+    }
+}

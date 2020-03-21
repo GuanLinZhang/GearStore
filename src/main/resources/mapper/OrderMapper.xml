@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC
+        "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.interconn.demo.Dao.OrderDao">
+    <cache/>
+    <insert id="saveObject" parameterType="Order">
+        insert into `order` (id, order_id, openId, is_paid, address, telephone, contact, order_desc, total_price,
+                             status, createdTime, modifiedTime, modifiedUser, createdUser)
+        values (default, #{order_id}, #{openId}, 0, #{address}, #{telephone}, #{contact}, #{order_desc}, #{total_price},
+                0, now(), default, default, #{createdUser});
+    </insert>
+
+    <resultMap id="OrderMap" type="Order">
+        <result column="id" property="id" javaType="int"/>
+        <result column="order_Id" property="order_id"/>
+        <result column="openId" property="openId"/>
+        <result column="is_paid" property="is_paid"/>
+        <result column="order_desc" property="order_desc"/>
+        <result column="total_price" property="total_price"/>
+        <result column="status" property="status"/>
+        <result column="createdTime" property="createdTime"/>
+        <result column="modifiedTime" property="modifiedTime"/>
+        <result column="createdUser" property="createdUser"/>
+        <result column="modifiedTime" property="modifiedTime"/>
+        <result column="modifiedUser" property="modifiedUser"/>
+        <result column="address" property="address"/>
+        <result column="telephone" property="telephone"/>
+        <result column="post_code" property="post_code"/>
+        <result column="contact" property="contact"/>
+        <association property="user" javaType="WechatUser" column="openId"
+                     select="com.interconn.demo.Dao.WechatUserDao.findObjectByOpenId"/>
+        <collection property="orderItemList" ofType="OrderItem" column="order_Id"
+                    select="com.interconn.demo.Dao.OrderItemDao.findObjectByOrderId"/>
+    </resultMap>
+    <select id="findObject" resultMap="OrderMap">
+        select o.id as id,
+        order_Id,
+        o.openId as openId,
+        is_paid,
+        order_desc,
+        total_price,
+        o.status as status,
+        createdTime,
+        modifiedTime,
+        modifiedUser,
+        createdUser,
+        o.address,
+        o.telephone,
+        o.post_code,
+        o.contact
+        from `order` o
+        <where>
+            <if test="openId != null and openId != ''">
+                openId = #{openId}
+            </if>
+            <if test="order_id != null">
+                and order_Id = #{order_id}
+            </if>
+            <if test="is_paid != null">
+                and is_paid = #{is_paid}
+            </if>
+            <if test="status != null">
+                and status = #{status}
+            </if>
+            <if test="createdUser != null and createdUser != ''">
+                and createdUser like concat('%',#{createdUser},'%')
+            </if>
+        </where>
+        order by createdTime desc,is_paid desc, status desc
+        <if test="startIndex != null and pageSize != null">
+            limit #{startIndex},#{pageSize}
+        </if>
+    </select>
+
+    <update id="updateObject" parameterType="Order">
+        update `order`
+        <set>
+            <if test="is_paid != null">
+                is_paid = #{is_paid},
+            </if>
+            <if test="status != null">
+                status = #{status},
+            </if>
+            <if test="total_price != null">
+                total_price = #{total_price},
+            </if>
+            <if test="address != null and address != ''">
+                address = #{address},
+            </if>
+            <if test="telephone != null and telephone != ''">
+                telephone = #{telephone},
+            </if>
+            <if test="post_code != null and post_code != ''">
+                post_code = #{post_code},
+            </if>
+            <if test="contact != null and contact != ''">
+                contact = #{contact},
+            </if>
+            modifiedTime = now(),
+            modifiedUser = #{modifiedUser}
+        </set>
+        where order_Id = #{order_id}
+    </update>
+
+    <select id="findObjectById" parameterType="string" resultType="Order">
+        select id,
+               order_Id,
+               openId,
+               is_paid,
+               address,
+               telephone,
+               contact,
+               order_desc,
+               total_price,
+               status,
+               createdTime,
+               modifiedTime,
+               modifiedUser,
+               createdUser,
+               post_code
+        from `order`
+        where order_Id = #{order_id}
+    </select>
+    <select id="getRowCount" resultType="int" parameterType="Order">
+        select count(*)
+        from `order`
+        <where>
+            <if test="openId != null and openId != ''">
+                openId = #{openId}
+            </if>
+            <if test="order_id != null">
+                and order_Id = #{order_id}
+            </if>
+            <if test="is_paid != null">
+                and is_paid = #{is_paid}
+            </if>
+            <if test="status != null">
+                and status = #{status}
+            </if>
+        </where>
+    </select>
+
+    <delete id="deleteObject" parameterType="string">
+        delete
+        from `order`
+        where order_Id = #{order_id}
+    </delete>
+</mapper>

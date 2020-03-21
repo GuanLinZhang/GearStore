@@ -1,0 +1,104 @@
+获得管理员列表
+url: /admin/getAdmin
+method: GET
+data: {
+    pageCurrent(代表当前页),
+    username(可选参数,用于模糊查询,例如传入 张 得到所有username带张的用户列表)
+}
+
+返回json
+{
+    "state": 1,
+    "message": "查询成功",
+    "data": {
+        "records": [
+            {
+                "id": 8,
+                "username": "admin",
+                "password": "c0e024d9200b5705bc4804722636378a",
+                "createdTime": "2019-09-19 13:00:00",
+                "createdUser": null,
+                "modifiedUser": null,
+                "modifiedTime": "2019-09-19 13:00:00",
+                "status": 1
+            }
+        ],
+        "rowCount": 1,
+        "pageCount": 1,
+        "pageCurrent": 1
+    }
+}
+
+管理员登录
+url: /admin/login
+method: POST
+data: {
+    username
+    password
+}
+
+返回json
+
+{
+    state: 1
+    message: 登录成功
+}
+
+{
+    state: 0
+    message: 登录失败
+}
+
+
+删除管理员
+url: /admin/deleteAdmin
+method: delete
+data: {
+    id: 管理员id(可支持列表)
+}
+返回json:
+{
+    "state": 1,
+    "message": "删除成功",
+    "data": [
+        "11"
+    ]
+}
+
+更新管理员账号信息
+url: /admin/updateAdmin
+method: put
+data: {
+    id: 管理员id(可支持列表),
+    username: 新的管理员账号,
+    password: 新的管理员密码
+}
+返回json:
+{
+    "state": 1,
+    "message": "更新成功",
+    "data": {
+        "id": 10,
+        "username": "hahah",
+        "password": "8a35315f47aeb619b27d481e74d4293a",
+        "createdTime": null,
+        "createdUser": null,
+        "modifiedUser": null,
+        "modifiedTime": null,
+        "status": 0
+    }
+}
+
+url: /admin/register
+method: post
+data: {
+    username: 管理员账号,
+    password: 管理员密码 注意input type=password
+    createdUser: (可选) 创建人
+}
+返回json
+{
+    "state": 1,
+    "message": "注册成功",
+    "data": null
+}

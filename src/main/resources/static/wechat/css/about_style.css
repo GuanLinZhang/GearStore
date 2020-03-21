@@ -1,0 +1,303 @@
+body{
+	max-width: 1024px;
+	margin: 0 auto;}
+.title h2{
+	text-align: center;
+	font-size: 1.4em;
+}
+.title h2 span{
+	display: block;
+	font-size: 0.5em;
+	color: #C7254E;
+	padding: 5px 0;
+	font-weight: 100;
+}
+.pa10{
+	padding: 10px;
+}
+.top20{
+	margin-top: 20px;
+}
+.bot15{
+	margin-bottom: 30px;
+}
+.suo{
+	text-indent:30px;
+}
+/*导航*/
+header{
+		position: relative;
+		padding: 0 5px;
+}
+.icon-list-ul{
+	font-size: 2em;
+	background: #7d7575;
+	color: #fff;
+	border: 1px solid #ccc;
+	border-radius: 5px;
+	padding: 5px;
+	margin-top: 20px;
+}
+nav{
+	width: 100%;
+}
+nav li{
+	text-align: center;
+	background: #000;
+	padding: 5px 0;
+	border-bottom: 1px solid #CCCCCC;
+}
+nav li a{
+		color: #fff;
+}
+nav li:last-child{
+	border-bottom: none;
+}
+nav ul{
+	display: none;
+	position: absolute;
+	left: 0;
+	z-index: 30;
+	width: 100%;
+}
+/*关于我们*/
+.nei{
+	font-size:0.8em;
+	color: #2A333C;
+	line-height: 25px;
+}
+.more{
+	border:1px solid #212121;
+	display: block;
+	text-align: center;
+	padding: 8px 0;
+	margin: 10px 0;
+}
+.ab{
+	position: relative;
+}
+.ab img{
+	max-height: 200px;
+	width: 100%;
+}
+.ab p{
+	position: absolute;
+	top:40px;
+	right: 5%;
+	color: #fff;
+	background: #b92825;
+	width: 40%;
+	padding: 8px;
+}
+/*产品中心*/
+.pro ul li{
+	width: 49%;
+	margin-bottom: 15px;
+}
+.pro img{
+	width: 100%;
+}
+.pro li a span{
+	text-align: center;
+	display: block;
+	font-size: 0.8em;
+}
+/*优势*/
+.advan ul{
+		background: #4e4c4c;
+}
+.advan li{
+	width: 49%;
+	text-align: center;
+	color: #fff;
+	padding: 10px 5px;
+}
+.advan p{
+	font-size: 0.8em;
+}
+/*新闻动态*/
+.new>ul li{
+	border-bottom: 1px dashed #c6c6c6;
+	padding: 10px 0;
+}
+.new span{
+	display: block;
+	font-size: 0.8em;
+}
+.new>ul li a{
+	font-size: 0.9em;
+}
+/*页尾*/
+footer{
+	background: #000000;
+	color: #fff;
+	padding-top: 30px;
+	text-align: center;
+}
+
+footer h3{
+	margin-bottom: 15px;
+}
+footer h3 span{
+	display: block;
+	font-weight: 100;
+	font-size: 0.7em;
+}
+.f_t p{
+	font-size: 0.7em;
+	line-height: 25px;
+}
+.f_t p span{
+	margin-right: 10px;
+}
+.f_b p{
+	font-size: 0.7em;
+	
+}
+/*返回顶部*/
+.back-top{
+	position: fixed;
+	right:10px;
+	bottom:10px;
+	z-index: 40;
+	display: none;
+}
+/*关于我们单页*/
+.ab-dan{
+	margin-bottom: 30px;
+}
+.ab-dan p{
+	line-height: 20px;
+}
+.ab-dan img{
+	width: 90%;
+	margin: 20px auto;
+	display: block;
+}
+/*产品单页*/
+.p-dan img{
+	width: 100%;
+}
+.p-dan .p_c li{
+	width: 49%;
+	padding: 0 8px;
+	margin-bottom: 15px;
+	text-align: center;
+}
+.p-dan li span{
+	display: block;
+	padding: 5px 0;
+}
+/*分页*/
+.page{
+	text-align: center;
+}
+.page a{
+	margin: 0 2px;
+	display: inline-block;
+	padding: 5px 10px;
+	border: 1px solid #C0C0C0;
+	border-radius: 5px;
+	font-size: 14px;
+}
+.page a.active{
+	background:#F90000 ;
+	color: #fff;
+}
+/*团队*/
+.te-tu{
+	width: 40%;
+}
+.te-tu p{
+	width: 100%;
+	height: 200px;
+	position: relative;
+	border: 1px solid #000000;
+}
+.te-tu img{
+	position: absolute;
+	left: 6px;
+	top:6px;
+	width: 100%;
+	height: 200px;
+}
+article{
+	margin-left: 20px;
+	float: left;
+	width: 55%;
+}
+article h4{
+	font-size: 1.3em;
+}
+article span{
+	
+}
+article p{
+	font-size: 14px;
+	color: #626161;
+}
+/*新闻单页*/
+.tab{
+	text-align: center;
+	margin-bottom: 15px;
+}
+.tab a{
+	display: inline-block;
+	padding: 5px 20px ;
+	background: hsla(0, 85%, 61%, 0.69);
+	border-radius: 5px;
+	color: #fff;
+	margin-right: 20px;
+}
+.tab .active{
+	background: rgb(249, 0, 0);
+}
+.lists{
+	display: none;
+}
+.lists.show{
+	display: block;
+}
+/*联系我们单页*/
+.lx h3{
+	text-align: center;
+}
+.lx-d{
+	width: 100%;
+}
+.lx p{
+	text-align: center;
+	line-height: 30px;
+}
+.lx span{
+	margin-right: 10px;
+}
+@media screen and (min-width: 768px) and (max-width:1020px) {
+	.abo div{
+		width: 50%;
+		float: left;
+		padding: 0 10px;
+	}
+	.te-tu{
+		height: 300px;
+	}
+	.te-tu{
+		height: 300px;
+	}
+	.new li span{
+		display: inline-block;
+		float: right;
+	}
+	.more{
+		width: 50%;
+		margin: 20px auto;
+	}
+}
+@media screen and (max-width:460px ) {
+	.te-tu{
+		width: 100%;
+	}
+	article{
+		width: 100%;
+	}
+}

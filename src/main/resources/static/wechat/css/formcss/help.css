@@ -1,0 +1,180 @@
+.all-answer {
+    /*height: 152px;*/
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+    background-color: #fff;
+}
+.all-answer .answr-title {
+    height: 41px;
+    line-height: 41px;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+    padding-left: 13px;
+    font-size: 16px;
+    border-width: 1px;
+    border-style: solid;
+    border-color: transparent transparent #eee transparent;
+    padding: 0 0 0 13px;
+}
+.all-answer .answer-entry {
+    height: 111px;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+    padding-top: 6px;
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: -ms-flexbox;
+    display: flex;
+}
+.all-answer .answer-entry a {
+    height: 111px;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+    -webkit-box-flex: 1;
+    -webkit-flex: 1;
+    -ms-flex: 1;
+    flex: 1;
+    display: block;
+    text-align: center;
+    font-size: 12px;
+    color: #000;
+}
+.all-answer .answer-entry a span {
+    background-repeat: no-repeat;
+    background-position: 3px 15px;
+    display: block;
+    width: 55px;
+    height: 55px;
+    margin: 0 auto;
+    padding-bottom: 25px;
+}
+.all-answer .answer-entry .entry-list1 {
+    background-image: url(../img/help/m_1s.png);
+    -webkit-background-size: 100%;
+    background-size: 100%;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+.all-answer .answer-entry .entry-list2 {
+    background-image: url(../img/help/m_3s.png);
+    -webkit-background-size: 100%;
+    background-size: 100%;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+.all-answer .answer-entry .entry-list3 {
+    background-image: url(../img/help/m_2s.png);
+    -webkit-background-size: 100%;
+    background-size: 100%;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+.all-answer .answer-entry .entry-list4 {
+    background-image: url(../img/help/m_4s.png);
+    -webkit-background-size: 100%;
+    background-size: 100%;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+.all-answer .answer-entry .entry-list5 {
+    background-image: url(../img/help/m_5s.png);
+    -webkit-background-size: 100%;
+    background-size: 100%;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+.all-answer .answer-entry .entry-list6 {
+    background-image: url(../img/help/m_6s.png);
+    -webkit-background-size: 100%;
+    background-size: 100%;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+.all-answer .answer-entry .entry-list7 {
+    background-image: url(../img/help/m_7s.png);
+    -webkit-background-size: 100%;
+    background-size: 100%;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+.all-answer .answer-entry .entry-list8 {
+    background-image: url(../img/help/m_8s.png);
+    -webkit-background-size: 100%;
+    background-size: 100%;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+/*常见问题*/
+.question-title {
+    height: 42px;
+    line-height: 42px;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+    border-width: 1px;
+    border-style: solid;
+    border-color: transparent transparent #eee transparent;
+    padding: 0 0 0 13px;
+    padding-left: 13px;
+    margin-top: 10px;
+    background-color: #fff;
+    font-size: 16px;
+}
+.question-list {
+    list-style: none;
+    background-color: #fff;
+    padding: 0;
+    margin-top: 0;
+}
+.question-list li {
+    height: 50px;
+    line-height: 50px;
+    position: relative;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+    color: #000;
+    font-size: 15px;
+}
+.question-list li a {
+    width: 93%;
+    display: block;
+    height: inherit;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+    padding-left: 13px;
+    border-width: 1px;
+    border-style: solid;
+    border-color: transparent transparent #eee transparent;
+    padding: 0 0 0 13px;
+    color: #000;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+
+/*具体问题*/
+.faq-title {
+    /*height: 50px;*/
+    line-height: 35px;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+    padding-lfet: 13px;
+    border-width: 1px;
+    border-style: solid;
+    border-color: transparent transparent #eee transparent;
+    padding: 0 0 0 13px;
+    background-color: #fff;
+    color: #000;
+    font-size: 16px;
+}
+.faq-content {
+    height: auto;
+    line-height: 24px;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+    padding: 15px 13px;
+    background-color: #fff;
+    font-size: 14px;
+    color: #000;
+    margin-bottom: 10px;
+}

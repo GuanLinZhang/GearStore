@@ -1,0 +1,99 @@
+获得类别列表
+url: "/category/getAll"
+method: get
+data: 无
+返回json
+{
+    "state": 1,
+    "message": "查询成功",
+    "data": [
+        {
+            "id": 1,
+            "category_name": "xxczxc",
+            "cover_img": "czxc",
+            "createdTime": "2019-09-23 11:14:25",
+            "createdUser": "",
+            "modifiedTime": "2019-09-23 11:24:11",
+            "modifiedUser": null,
+            "status": 1
+        },
+        {
+            "id": 6,
+            "category_name": "djiwod",
+            "cover_img": "dwd",
+            "createdTime": "2019-09-23 11:19:02",
+            "createdUser": "",
+            "modifiedTime": null,
+            "modifiedUser": null,
+            "status": 1
+        }
+    ]
+}
+------------------------------------------------------------------------------------------------------------------------
+添加类别
+url: "/category/save"
+method: post
+data: {
+    category_name: 类别名称 类似: 蔬菜类,水果类
+}
+返回json:
+{
+    "state": 1,
+    "message": "保存成功",
+    "data": {
+        "id": null,
+        "category_name": "蔬菜类",
+        "cover_img": null,
+        "createdTime": null,
+        "createdUser": null,
+        "modifiedTime": null,
+        "modifiedUser": null,
+        "status": null
+    }
+}
+------------------------------------------------------------------------------------------------------------------------
+根据id更新类别
+url: "/category/update"
+method: put
+data: {
+    category_name: 新的类别名称
+    id: 要更新的类别id
+}
+返回json:
+{
+    "state": 1,
+    "message": "更新成功",
+    "data": {
+        "id": 7,
+        "category_name": "水果类",
+        "cover_img": null,
+        "createdTime": null,
+        "createdUser": null,
+        "modifiedTime": null,
+        "modifiedUser": null,
+        "status": null
+    }
+}
+------------------------------------------------------------------------------------------------------------------------
+逻辑删除类别
+url: "/category/delete"
+method: delete
+data: {
+    id: 要删除的类别id
+}
+返回json
+{
+    "state": 1,
+    "message": "删除成功",
+    "data": {
+        "id": 7,
+        "category_name": null,
+        "cover_img": null,
+        "createdTime": null,
+        "createdUser": null,
+        "modifiedTime": null,
+        "modifiedUser": null,
+        "status": null
+    }
+}
+

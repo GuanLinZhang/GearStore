@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC
+        "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.interconn.demo.Dao.WechatUserDao">
+    <cache/>
+    <select id="findPageObjects" resultType="WechatUser">
+        select
+        id, openId, nickName, headImg, createdTime, status, integral, referrer, createdUser, modifiedTime,
+        modifiedUser, QRCode, cityName, country, province
+        from wx_user
+        <where>
+            <if test="user.openId != null and user.openId != ''">
+                openId = #{user.openId}
+            </if>
+            <if test="user.nickName != null and user.nickName != ''">
+                and nickName like concat('%',#{user.nickName},'%')
+            </if>
+            <if test="user.cityName != null and user.cityName != ''">
+                and cityName like concat('%',#{user.cityName},'%')
+            </if>
+            <if test="user.country != null and user.country != ''">
+                and country like concat('%',#{user.country},'%')
+            </if>
+            <if test="user.province != null and user.province != ''">
+                and province like concat('%',#{user.province},'%')
+            </if>
+        </where>
+        order by createdTime desc
+        <if test="startIndex != null and pageSize != null">
+            limit #{startIndex},#{pageSize}
+        </if>
+    </select>
+
+    <select id="findObjectByOpenId" parameterType="String" resultType="WechatUser">
+        select id,
+               openId,
+               nickName,
+               headImg,
+               createdTime,
+               status,
+               integral,
+               referrer,
+               createdUser,
+               modifiedTime,
+               modifiedUser,
+               QRCode,
+               cityName,
+               country,
+               province
+        from wx_user
+        where openId = #{openId}
+    </select>
+
+    <select id="findIntegral" parameterType="WechatUser" resultType="Double">
+        select integral
+        from wx_user
+        where openId = #{openId}
+    </select>
+
+
+    <select id="findQRCodeByOpenId" parameterType="WechatUser" resultType="String">
+        select QRCode
+        from wx_user
+        where openId = #{openId}
+    </select>
+
+    <select id="getRowCount" parameterType="WechatUser" resultType="int">
+        select count(*)
+        from wx_user
+        <where>
+            <if test="nickName != null and nickName != ''">
+                nickName like concat('%',#{nickName},'%')
+            </if>
+            <if test="cityName != null and cityName != ''">
+                and cityName like concat('%',#{cityName},'%')
+            </if>
+            <if test="country != null and country != ''">
+                and country like concat('%',#{country},'%')
+            </if>
+            <if test="province != null and province != ''">
+                and province like concat('%',#{province},'%')
+            </if>
+        </where>
+    </select>
+
+    <insert id="saveObject" parameterType="WechatUser">
+        insert into wx_user (id, openId, nickName, headImg, createdTime, status, integral, referrer, createdUser,
+                             modifiedTime, modifiedUser, QRCode, cityName, country, province)
+        values (default, #{openId}, #{nickName}, #{headImg}, now(), 1, 0,
+                default, #{createdUser}, default, default,
+                #{QRCode}, #{cityName}, #{country}, #{province});
+    </insert>
+
+    <update id="updateObject" parameterType="WechatUser">
+        update wx_user
+        <set>
+            <if test="integral != null">
+                integral = #{integral},
+            </if>
+            modifiedTime = now(),
+            modifiedUser = #{modifiedUser},
+        </set>
+        where openId = #{openId}
+    </update>
+
+    <update id="updateIntegralByOrderId">
+        update wx_user
+        set integral = integral + #{payBackIntegral}
+        where openId = (select `order`.openId from `order` where `order`.order_Id = #{order_id})
+
+    </update>
+</mapper>

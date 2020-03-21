@@ -1,0 +1,55 @@
+.head{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    background-color: white;
+    padding: 3% 6%;
+    width:88%;
+}
+.user_details{
+    display: flex;
+    flex-direction: column;
+    width: 75%;
+}
+.user_name{
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
+.name {
+    margin-right: 20%;
+}
+/*按钮*/
+.button{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+}
+.select_btn{
+    color: white;
+    /*background-color:#6ebb6e;*/
+    height: 35px;
+    width: 100px;
+    margin-left: 100px;
+}
+/*.select_btn p{*/
+/*    position: absolute;*/
+/*    top: -10%;*/
+/*    left: 27%*/
+/*}*/
+.button button{
+    width: 60%;
+}
+#btn1{
+    margin: 50px 0 0;
+}
+#btn2{
+    margin: 50px 0 0;
+}
+.button button{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}

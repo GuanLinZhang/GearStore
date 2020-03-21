@@ -1,0 +1,586 @@
+<div class="card shadow mb-4">
+  <div class="card-header py-3">
+    <h6 class="m-0 font-weight-bold text-primary">商品管理</h6>
+    <form action="" class="search_list_parent">
+      <input type="text" class="search_list_search" id="searchGoodsName">
+      <input type="button" value="搜索" id="searchUser" class="search_list_btn">
+    </form>
+    <button class='btn btn-success' id="addUser">添加商品</button>
+  </div>
+  <div class="card-body">
+    <div class="table-responsive">
+      <table class="table">
+        <thead>
+        <tr>
+          <th scope="col" id="id">编号</th>
+          <th scope="col" id="goodsName">商品名</th>
+          <th scope="col" id="coverImg">封面图</th>
+          <th scope="col" id="Price">单价(元/500g)</th>
+          <th scope="col" id="createdTime">创建时间</th>
+          <th scope="col" id="modifiedTime">修改时间</th>
+          <th scope="col" id="status">当前状态</th>
+          <th scope="col" id="recommended">设为推荐</th>
+          <th scope="col" style="padding-left:20px;">更改</th>   <!--  更改:商品名   封面图   单价-->
+          <th scope="col" style="padding-left:32px; ">删除</th>
+        </tr>
+        </thead>
+        <tbody>
+        </tbody>
+      </table>
+      <!--                    分页-->
+      <div id="pageId" class="box-footer clearfix" style="cursor: pointer">
+        <ul class="pagination justify-content-center">
+          <li class="page-item"><a class="first page-link">首页</a></li>
+          <li class="page-item"><a class="pre page-link">上一个</a></li>
+          <li class="page-item"><a class="next page-link">下一个</a></li>
+          <li class="page-item"><a class="last page-link">尾页</a></li>
+          <li class="page-item"><a class="rowCount page-link"></a></li>
+          <li class="page-item"><a class="pageCount page-link"></a></li>
+          <li class="page-item"><a class="pageCurrent page-link"></a></li>
+        </ul>
+      </div>
+
+    </div>
+  </div>
+  <link rel="stylesheet" href="../css/list.css">
+  <link href="/admin/vendor/datatables/dataTables.bootstrap4.min.css" rel="stylesheet">
+  <script src="https://cdn.bootcss.com/twitter-bootstrap/4.3.1/js/bootstrap.min.js"></script>
+
+  <!--    更改商品按钮的弹出框-->     <!--  更改:商品名   封面图   单价-->
+  <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+       aria-hidden="false">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">更改商品</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <form>
+            <div class="form-group">
+              <label for="changeId" class="col-form-label">商品id:</label>
+              <input type="text" class="form-control" id="changeId">
+            </div>
+            <div class="form-group">
+              <label for="changeGoodsName" class="col-form-label">商品名:</label>
+              <input type="text" class="form-control" id="changeGoodsName">
+            </div>
+            <label for="changeThumbnailInput" class="col-form-label">修改封面图:</label>
+            <div class="input-group form-group">
+              <div class="custom-file">
+                <input type="file" onchange="changeThumbNail()" id="changeThumbnailInput">
+                <label class="custom-file-label" for="changeThumbnailInput"></label>
+              </div>
+            </div>
+            <div class="form-group">
+              <img id="changeThumbNailBox"
+                   style="width: 150px;height: auto;border-radius: 15px;padding: 5px;">
+            </div>
+            <label for="changePrice" class="col-form-label">单价:</label>
+            <div class="input-group form-group">
+              <input type="text" id="changePrice" class="form-control"
+                     aria-label="Dollar amount (with dot and two decimal places)">
+              <div class="input-group-append">
+                <span class="input-group-text">元/500g</span>
+              </div>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">取消修改</button>
+          <button type="button" class="btn btn-primary" id="determineChange">确认修改</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!--   添加商品按钮的弹出框-->
+  <div class="modal fade" id="exampleModal2" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+       aria-hidden="false">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="addExampleModalLabel">添加商品</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <form>
+            <div class="form-group">
+              <label for="add_Serialn_number" class="col-form-label">商品编号:</label>
+              <input type="text" class="form-control" id="add_Serialn_number">
+            </div>
+
+            <div class="form-group">
+              <label for="addGoodsName" class="col-form-label">商品名:</label>
+              <input type="text" class="form-control" id="addGoodsName">
+            </div>
+
+            <label for="addCategory" class="col-form-label">种类:</label>
+            <div class="form-group">
+              <select class="form-control col-form-label" id="addCategory"> <!--  添加商品种类,动态下拉菜单-->
+              </select>
+            </div>
+            <label for="thumbnailInput" class="col-form-label">添加封面图:</label>
+            <div class="input-group form-group">
+              <div class="custom-file">
+                <input type="file" onchange="showThumbNail()" id="thumbnailInput">
+                <label class="custom-file-label" for="thumbnailInput"></label>
+              </div>
+            </div>
+            <div class="form-group"> <!-- 预览封面图-->
+              <img id="thumbNailBox" style="width: 150px;height: auto;border-radius: 15px;padding: 5px;">
+            </div>
+
+            <label for="addPrice" class="col-form-label">单价:</label>
+            <div class="input-group form-group">
+              <input type="text" id="addPrice" class="form-control"
+                     aria-label="Dollar amount (with dot and two decimal places)">
+              <div class="input-group-append">
+                <span class="input-group-text">元/500g</span>
+
+              </div>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">取消添加</button>
+          <button type="button" class="btn btn-primary" id="determineAdd">确认添加</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+<script>
+    /**请求当前页*/
+    $(function () {
+        // 当页面加载时请求当前页
+        doFindObject();
+        $(".clearfix").on("click", ".first,.pre,.next,.last", doJumpToPage);
+        $("#determineChange").on("click", updateGoods);
+        $("#determineAdd").on("click", saveGoods);
+        $("#addUser").on("click", empty);
+        renderCategory();
+    });
+
+    /**添加商品时候照片回显*/
+    function showThumbNail() {
+        let input_File = $("#thumbnailInput");
+        var file = input_File.get(0).files[0];
+        if (file == null) {
+            alert("图片错误,请重新上传图片");
+            input_File.val("");
+        }
+        var src = window.URL.createObjectURL(file);
+        console.log("src", src);
+        $("img#thumbNailBox").attr({
+            src: src,
+            width: 100 + '%',
+            height: 100 + '%',
+        });
+    }
+
+    /**更改商品时候照片回显*/
+    function changeThumbNail() {
+        let input_File = $("#changeThumbnailInput");
+        var file = input_File.get(0).files[0];
+        if (file == null) {
+            alert("图片错误,请重新上传图片");
+            input_File.val("");
+        }
+        var src = window.URL.createObjectURL(file);
+        console.log("src", src);
+        $("img#changeThumbNailBox").attr({
+            src: src,
+            width: 100 + '%',
+            height: 100 + '%',
+        });
+    }
+
+
+    // 当点击添加按钮时清空输入框中的值
+    function empty() {
+        // 清空值
+        $("#add_Serialn_number").val("");
+        $("#addGoodsName").val("");
+        $("#addCategory").val("");
+        $("#addPrice").val("");
+        $("#thumbNailBox").attr("src", "");
+        $("#exampleModal2").modal("show");
+    }
+
+    /**当点击侧栏按钮执行此函数*/
+    function doFindObject() {
+        var pageCurrent = $("#pageId").data("pageCurrent");  //给PageId附上属性pageCurrent
+        if (!pageCurrent) pageCurrent = 1;    //如果pageCurrent为null,则证明为此时当前页
+        $.ajax({
+            url: "/goods/get",
+            method: "get",
+            data: {
+                pageCurrent: pageCurrent,
+            },
+        }).done(function (result) {
+            console.log("result", result);
+            if (result.state === 1) {
+                // 显示数据
+                doRender(result.data.records);
+                // 设置分页
+                setPagination(result.data);
+            }
+        })
+    }
+
+    /**选择类别  下拉菜单*/
+    function renderCategory() {
+        $.ajax({
+            url: "/category/getAll",
+            method: "get",
+        }).done(function (result) {      //.done 拿到的必须是一个对象
+            console.log("下拉菜单", result);
+
+            var select = $("#addCategory");
+            select.empty();
+
+            var data = result.data;
+            data.forEach(function (item, index, array) {
+                var option = $("<option>");
+                option.text(item.category_name);
+                option.val(item.id);
+                select.append(option);
+            })
+        })
+    }
+
+    /**商品的删除操作:*/
+    function deleteBtnClicked() {
+        var goods_id = $(this).parent().parent().data("goods_id"); //拿到对应的id
+        console.log("Deleteid", goods_id);
+        if (confirm("确认删除吗?")) {     //confirm的调用
+            $.ajax({
+                url: "/goods/delete",
+                method: "delete",
+                data: {
+                    goods_id: goods_id,
+                }
+            }).done(function (result) {
+                doFindObject();
+            })
+        }
+    }
+
+    function doStatusBtnClicked() {
+        let goods_id = $(this).parent().parent().data("goods_id");
+        let status = $(this).text() === "下架商品" ? 0 : 1;
+        $.ajax({
+            url: "/goods/update",
+            method: "put",
+            data: {
+                goods_id: goods_id,
+                status: status,
+            }
+        }).done(function (res) {
+            if (res.state === 1) {
+                doFindObject();
+            } else {
+                alert(res.message);
+            }
+        })
+    }
+
+    /**动态列表渲染*/
+    function doRender(records) {
+        let tbody = $("tbody");
+        tbody.empty();
+        records.forEach(function (item, index, array) {
+            for (let i in item) {
+                if (!item[i]) {
+                    item[i] = "暂无";
+                }
+            }
+            let tr = $("<tr>");
+            tr.data("goods_id", item.goods_id);
+            let id_td = $("<td>");
+            id_td.text(item.id);
+            tr.append(id_td);
+
+            let goods_name_td = $("<td>");
+            goods_name_td.text(item.goods_name);
+            tr.append(goods_name_td);
+
+            let coverImg_td = $("<td>");      // 此处添加照片,得有一个框来装照片
+            coverImg_td.css("width", "130px");
+            coverImg_td.css("vertical-align", "unset");
+            let coverImg = $("<img>");
+            coverImg.css("width", "100%");
+            coverImg.css("border-radius", "15px");
+            coverImg.attr("src", item.cover_img);
+            coverImg_td.append(coverImg);
+            tr.append(coverImg_td);
+
+            let price_td = $("<td>");
+            price_td.text(item.price);
+            tr.append(price_td);
+
+            let createdTime_td = $("<td>");
+            createdTime_td.text(item.createdTime);
+            tr.append(createdTime_td);
+
+            // let modifiedUser_td = $("<td>");
+            // modifiedUser_td.text(item.modifiedUser);
+            // tr.append(modifiedUser_td);
+
+            let modifiedTime_td = $("<td>");
+            modifiedTime_td.text(item.modifiedTime);
+            tr.append(modifiedTime_td);
+
+            let status_td = $("<td>");
+            console.log(item.status)
+            let status_btn = $("<button class='btn btn-primary'/>");
+
+            if (item.status == "暂无") {
+                status_btn.text("上架");
+                status_btn.addClass("btn btn-primary");
+            } else {
+                status_btn.text("下架商品");
+                status_btn.addClass("btn btn-secondary");
+            }
+            status_btn.on("click", doStatusBtnClicked);
+            status_td.append(status_btn);
+            tr.append(status_td);
+
+            let recmmended_td = $("<td>");
+            let recmmended_button = $("<button>");
+            console.log("g", item.isRecommended);
+            if (item.isRecommended == "暂无") {
+                recmmended_button.text("设为推荐");
+                recmmended_button.addClass("btn btn-success");
+            } else {
+                recmmended_button.addClass("btn btn-danger");
+                // recmmended_button.addClass("btn-danger");
+                recmmended_button.text("取消推荐");
+            }
+            recmmended_button.on("click", recommend);
+            recmmended_td.append(recmmended_button);
+            tr.append(recmmended_td);
+
+
+            let button_td = $("<td>");
+            let button = $("<button class='btn btn-info'>更改</button>");
+            button_td.append(button);
+            button.on("click", changePassword);
+            tr.append(button_td);
+
+            let delete_td = $("<td>");
+            let delete_button = $("<button class='btn btn-danger'>删除</button>");
+            // if (item.status == "暂无") {
+            //     delete_button.attr("disabled", true);
+            //     button.attr("disabled", true);
+            // }
+            delete_td.append(delete_button);
+            delete_button.on("click", deleteBtnClicked);
+            tr.append(delete_td);
+
+            tbody.append(tr);
+        })
+    }
+
+    /** 推荐商品*/
+    function recommend() {
+        var goods_id = $(this).parent().parent().data("goods_id");
+        var btnWord = $(this).text();
+        var isRecommended;
+        if (btnWord == "取消推荐") {
+            isRecommended = 0;
+        } else {
+            isRecommended = 1;
+        }
+        $.ajax({
+            url: "/goods/update",
+            method: "put",
+            data: {
+                goods_id: goods_id,
+                isRecommended: isRecommended,
+            }
+        }).done(function (result) {
+            console.log("推荐提示", result);
+            doFindObject();
+        })
+    }
+
+
+    /**添加商品*/
+    function saveGoods() {
+        let formData = new FormData();
+
+        let add_Serialn_number = $("#add_Serialn_number").val();
+        formData.set("id", add_Serialn_number);  //商品编号
+
+        let GoodsName = $("#addGoodsName").val();
+        formData.set("goods_name", GoodsName);   //商品名
+
+        let Catagroy = $("#addCategory").val();    //类名
+        formData.set("category_id", Catagroy);
+
+        let Img = $("#thumbnailInput").get(0).files[0];
+        console.log("img", Img);
+        formData.set("coverImg", Img);   //商品图片
+
+        let price = $("#addPrice").val();   //商品价钱
+        formData.set("price", price);
+
+        if (GoodsName === "" || Catagroy === "" || Img === "" || price === "" || add_Serialn_number === "") {
+            alert("商品信息不能为空");
+            return;
+        }
+
+        $.ajax({
+            url: "/goods/save",
+            method: "post",
+            data: formData,
+            processData: false,
+            contentType: false,
+        }).done(function (result) {
+            console.log("拿到被添加的数据", result);
+            if (result.state === 1) {
+                alert("添加成功");
+                doFindObject();
+            }
+            $("#exampleModal2").modal("hide");
+        })
+    }
+
+    /**商品的修改操作:*/
+    function changePassword() {
+        $("#changeId").val("");
+        $("#changeGoodsName").val("");
+        $("#changePrice").val("");
+        $("#changeThumbnailInput").val("");
+        // $("#thumbNailBox").attr("src", "");
+        var changeGoodsName = $(this).parent().parent().children(":first").next().text();  //为了让弹出框的value默认为用户名
+        var changeId = $(this).parent().parent().children(":first").text();  //为了让弹出框的value默认为用户名
+        console.log(changeGoodsName);
+        // console.log("哈哈哈这是",changeGoodsName);
+        $("#changeGoodsName").val(changeGoodsName);
+        $("#changeId").val(changeId);
+        // $("#changePrice").val();
+        var id = $(this).parent().parent().children(":first").text(); //拿到对应的id
+        console.log("this", this);
+        console.log("id", id);
+        // $(".modal-dialog").data("id", id);
+        $(".modal-dialog").data("goods_id", $(this).parent().parent().data("goods_id"));
+
+        var changeThumbnail = $(this).parent().parent().find("img").attr("src");
+        console.log("图片", changeThumbnail);
+        $("#changeThumbNailBox").attr("src", changeThumbnail);
+        $("#exampleModal").modal("show");
+    }
+
+    function updateGoods() {
+        let formData = new FormData();
+        let goods_id = $(".modal-dialog").data("goods_id");   //商品id
+        let id = $("#changeId").val();   //商品id
+        console.log("goods_id", goods_id);
+        formData.set("goods_id", goods_id);
+        formData.set("id", id);
+        let changeGoodsName = $("#changeGoodsName").val();
+        formData.set("goods_name", changeGoodsName);    //商品名
+
+        let Img = $("#changeThumbnailInput").get(0).files[0];
+        console.log("img", Img);
+        formData.set("coverImg", Img);       //商品图片
+
+        let price = $("#changePrice").val();   //商品价钱
+        formData.set("price", price);
+
+        if (changeGoodsName === "" || Img === "" || price == "") {
+            alert("商品信息不能为空");
+            return;
+        }
+        $.ajax({
+            url: "/goods/update",
+            method: "put",
+            data: formData,
+            processData: false,
+            contentType: false,
+        }).done(function (result) {
+            console.log("拿到被更改的数据", result);
+            if (result.state === 1) {
+                alert("更改成功");
+            } else {
+                alert(result.message);
+            }
+            $("#exampleModal").modal("hide");
+            doFindObject();
+        })
+    }
+
+    /**分页渲染*/
+    function setPagination(pageObject) {
+        $("#pageId").data("pageCurrent", pageObject.pageCurrent);
+        $("#pageId").data("pageCount", pageObject.pageCount);
+
+        $(".rowCount").html("总记录数(" + pageObject.rowCount + ")");
+        $(".pageCount").html("总页数(" + pageObject.pageCount + ")");
+        $(".pageCurrent").html("当前页(" + pageObject.pageCurrent + ")");
+
+    }
+
+    /**分页页面跳转*/
+    function doJumpToPage() {
+        var pageCurrent = $("#pageId").data("pageCurrent");
+        var pageCount = $("#pageId").data("pageCount");
+        var cls = $(this).prop("class");
+        //console.log(cls);
+        if (cls === "first page-link") {
+            pageCurrent = 1;
+        }
+        if (cls === "pre page-link" && pageCurrent > 1) {
+            pageCurrent--;
+        }
+        if (cls === "next page-link" && pageCurrent < pageCount) {
+            pageCurrent++;
+        }
+        if (cls === "last page-link") {
+            pageCurrent = pageCount;
+        }
+        $("#pageId").data("pageCurrent", pageCurrent);
+        doFindObject();
+    }
+
+    /**商品的搜索操作*/
+    $("#searchUser").on("click", function () {
+        let formData = new FormData();
+
+        let PageCurrent = $("#pageId").data("pageCurrent");
+        formData.set("pageCurrent", PageCurrent);
+        console.log("当前页", PageCurrent)
+
+        let SearchUsername = $("#searchGoodsName").val();
+        formData.set("goodsName", SearchUsername);
+        console.log("商品名", SearchUsername)
+
+        if (SearchUsername == null || SearchUsername == "") {
+            alert("查询不能为空");
+        }
+        $.ajax({
+            url: "/goods/get",
+            method: "get",
+            data: {
+                pageCurrent: PageCurrent,
+                goodsName: SearchUsername,
+            }
+        }).done(function (result) {
+            console.log("输入框拿到的值", result);
+            // 显示数据
+            doRender(result.data.records);
+            // 设置分页
+            setPagination(result.data);
+
+        })
+    })
+
+</script>

@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC
+        "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.interconn.demo.Dao.CategoryDao">
+    <select id="findPageObjects" resultType="Category">
+        select id,
+               category_name,
+               cover_img,
+               createdTime,
+               createdUser,
+               modifiedUser,
+               modifiedTime,
+               status
+        from category
+        order by status desc, createdTime desc
+        limit #{startIndex},#{pageSize};
+    </select>
+
+    <select id="findAllObjects" resultType="Category">
+        select id,
+               category_name,
+               cover_img,
+               createdTime,
+               createdUser,
+               modifiedUser,
+               modifiedTime,
+               status
+        from category
+        order by status
+            desc, createdTime
+    </select>
+
+    <select id="getRowCount" resultType="int">
+        select count(*)
+        from category;
+    </select>
+    <insert id="saveObject" parameterType="Category">
+        insert into category (id, category_name, cover_img, createdTime, createdUser, modifiedUser, modifiedTime,
+                              status)
+        values (default, #{category_name}, #{cover_img}, now(), #{createdUser}, default, default, 1);
+    </insert>
+
+    <update id="updateObjectById" parameterType="Category">
+        update category
+        <set>
+            <if test="category_name != null and category_name != ''">
+                category_name = #{category_name},
+            </if>
+            <if test="cover_img != null and cover_img != ''">
+                cover_img = #{cover_img},
+            </if>
+            modifiedTime = now(),
+            modifiedUser = #{modifiedUser}
+        </set>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteObject" parameterType="int">
+        delete
+        from category
+        where id = #{id}
+    </delete>
+</mapper>

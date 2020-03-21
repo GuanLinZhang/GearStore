@@ -1,0 +1,309 @@
+<!--<link rel="stylesheet" href="css/statement.css">-->
+<!--<div class="statement_container">-->
+<!--&lt;!&ndash;  <div class="statement_all">&ndash;&gt;-->
+<!--&lt;!&ndash;    <div class="statement">&ndash;&gt;-->
+<!--&lt;!&ndash;      <div class="statement_detail">&ndash;&gt;-->
+<!--&lt;!&ndash;        <div class="statement_type">转账</div>&ndash;&gt;-->
+<!--&lt;!&ndash;        <div class="statement_from">-来自郭志伟</div>&ndash;&gt;-->
+<!--&lt;!&ndash;      </div>&ndash;&gt;-->
+<!--&lt;!&ndash;      <div class="amount ">+54.50</div>&ndash;&gt;-->
+<!--&lt;!&ndash;    </div>&ndash;&gt;-->
+<!--&lt;!&ndash;    <div class="statement_time">&ndash;&gt;-->
+<!--&lt;!&ndash;      <div>10月14日</div>&ndash;&gt;-->
+<!--&lt;!&ndash;      <div>09:42</div>&ndash;&gt;-->
+<!--&lt;!&ndash;    </div>&ndash;&gt;-->
+<!--&lt;!&ndash;  </div>&ndash;&gt;-->
+<!--</div>-->
+<!--<script>-->
+<!--    $(function () {-->
+<!--        getTransferDetail();-->
+<!--    });-->
+
+<!--    function renderTransferDetail(records) {-->
+<!--        let container = $(".statement_container");-->
+<!--        records.forEach(function (item) {-->
+<!--            let statement_all = $("<div class='statement_all'>");-->
+<!--            let statement = $("<div class='statement'>");-->
+<!--            let statement_detail = $("<div class='statement_detail'>");-->
+<!--            let statement_type = $("<div class='statement_type'>");-->
+<!--            let goodsList = [];-->
+<!--            item.orderItemList.forEach(function (goods) {-->
+<!--                goodsList.push(goods.goods_name + " x " + goods.quantity);-->
+<!--            });-->
+<!--            statement_type.text(goodsList.join(","));-->
+<!--            statement_detail.append(statement_type);-->
+<!--            statement.append(statement_detail);-->
+
+<!--            let amount = $("<div class='amount'>");-->
+<!--            amount.text("-" + item.total_price);-->
+<!--            statement.append(amount);-->
+<!--            statement_all.append(statement);-->
+
+<!--            let statement_time = $("<div class='statement_time'>");-->
+<!--            statement_time.text(item.createdTime);-->
+<!--            statement_all.append(statement_time);-->
+<!--            container.append(statement_all);-->
+<!--        })-->
+<!--    }-->
+
+<!--    function getTransferDetail() {-->
+<!--        $.showLoading("正在加载...");-->
+<!--        $.ajax({-->
+<!--            url: "/order/get",-->
+<!--            method: "get",-->
+<!--            data: {-->
+<!--                openId: sessionStorage.getItem("openId"),-->
+<!--                is_paid: 1,-->
+<!--            }-->
+<!--        }).done(function (res) {-->
+<!--            $.hideLoading();-->
+<!--            renderTransferDetail(res.data.records);-->
+<!--        })-->
+<!--    }-->
+
+
+<!--</script>-->
+<link rel="stylesheet" href="css/order.css">
+<div class="bd">
+  <!--  <div class="page_bd">-->
+  <!--  <div class="weui-cells">-->
+  <!--    &lt;!&ndash;        订单时间和处理状态&ndash;&gt;-->
+  <!--    <div class="order">-->
+  <!--      <div class="order_time">-->
+  <!--        <div class="order_describe">订单日期:</div>-->
+  <!--        <div class="order_detail">2019-09-18</div>-->
+  <!--      </div>-->
+  <!--      <div class="order_deal">-->
+  <!--        <p>订单待处理</p>-->
+  <!--      </div>-->
+  <!--    </div>-->
+  <!--    &lt;!&ndash;        商品框&ndash;&gt;-->
+  <!--    <div class="weui-cell__bdcart_List">-->
+  <!--      <div class="list_Img">-->
+  <!--        <img src="img/text_fruits.png" alt="图片">-->
+  <!--      </div>-->
+  <!--      <div class="list_detail">-->
+  <!--        <div class="list_type">-->
+  <!--          <div class="name">西红柿</div>-->
+  <!--          <div class="g">500g</div>-->
+  <!--        </div>-->
+  <!--        <div class="integral_number">-->
+  <!--          <div class="integral">8积分</div>-->
+  <!--          <div class="number">&times 2</div>-->
+  <!--        </div>-->
+  <!--      </div>-->
+  <!--    </div>-->
+  <!--    <div class="consumption_results">-->
+  <!--      <div class="consumption_integral">-->
+  <!--        <div class="all_consumption">共消费积分:</div>-->
+  <!--        <div class="number_consumption">22</div>-->
+  <!--      </div>-->
+  <!--      <button href="#" class="weui-btn  select_btn" style="width: 90px; margin-left: 0px;margin-right: 0px">-->
+  <!--        <p>查&nbsp;看</p>-->
+  <!--      </button>-->
+  <!--    </div>-->
+</div>
+<a id="form-submit" class="weui-btn weui-btn_primary  ladda-button btn-block" data-style="expand-right"
+   data-size="l">
+  <!--  <img src="../wxassert/images/clickBtn.png" alt="">-->
+  <span id="span" class="ladda-label">点击查看下一页</span>
+</a>
+<span class="blank" style="height:20px;"></span>
+<script src="https://cdn.bootcss.com/moment.js/2.24.0/moment.js"></script>
+<script>
+    var pageCurrent = 0;
+    var pageCount = 0;
+
+    $(function () {
+        $("#view").on("click", function () {
+            $("#slidder").load("/doPayOrderUI");
+        });
+        getOrderList();
+        $('#form-submit').on("click", function (e) {
+            pageCurrent++;
+            console.log(pageCurrent);
+            e.preventDefault();
+            var l = Ladda.create(this);
+            l.start();
+            console.log("pageCount", pageCount);
+            if (pageCount <= 1) {
+                $("#form-submit").attr("class", "weui-btn weui-btn_primary weui-btn_disabled ladda-button btn-block");
+                document.getElementById("span").innerText = "没有更多了!";
+                l.stop();
+                $("#form-submit").blur();
+            }
+            $.get("/order/get",
+                {
+                    "openId": sessionStorage.getItem("openId"),
+                    "pageCurrent": pageCurrent,
+                    is_paid: 1,
+                    status: 1,
+                },
+                function (result) {
+                    pageCount--;
+                    if (result.state === 1) {
+                        //显示数据
+                        console.log(result);
+                        renderOrderList(result.data.records);
+                    } else {
+                        alert(result.message);
+                    }
+                }).always(
+                function () {
+                    l.stop();
+                    $("#form-submit").blur();
+                }
+            );
+            return false;
+
+        });
+        Ladda.bind('#form-submit');
+    });
+
+    function getOrderList() {
+        let openId = sessionStorage.getItem("openId");
+        $.ajax({
+            url: "/order/get",
+            data: {
+                openId: openId,
+                pageCurrent: ++pageCurrent,
+                is_paid: 1,
+                status: 1,
+            }
+        }).done(function (res) {
+            pageCount = res.data.pageCount;
+            let records = res.data.records;
+            if (records.length === 0) {
+                addEmptyImg($(".bd"));
+            }
+            renderOrderList(records);
+        })
+    }
+
+    function addEmptyImg(parentObj) {
+        $("#form-submit").hide();
+        let img = $("<img id='empty' />");
+        $(parentObj).css({
+            "align-items": "center",
+            "margin-top": "100px",
+        });
+        img.css({
+            "width": "240px",
+            "height": "185px",
+            "background-size": "100% 100%",
+            "background-repeat": "no-repeat",
+            "margin": "0 auto",
+            "display": "block",
+            "vertical-align": "middle",
+            "outline": "none",
+            "border": "none",
+        });
+        img.attr("src", "img/empty3.png");
+        $(parentObj).append(img);
+    }
+
+    function renderOrderList(records) {
+        let bd = $(".bd");
+        records.forEach(function (item) {
+            let weui_cells = $("<div class='weui-cells' />");
+            weui_cells.data("order_id", item.order_id);
+            let order = $("<div class='order'>");
+            let order_time = $("<div class='order_time'>");
+            let order_desc = $("<div class='order_describe'>");
+            order_desc.text("订单日期: ");
+            order_time.append(order_desc);
+            let order_detail = $("<div class='order_detail'>");
+            order_time.append(order_detail);
+            // let date = moment(item.createdTime).format('YYYY-MM-DD');
+
+            order_detail.text(item.createdTime);
+            order.append(order_time);
+            let order_deal = $("<div class='order_deal'>");
+            let p = $("<p>");
+            if (item.status === -1) {
+                p.text("已驳回");
+                p.css({
+                    "color": "#b2b2b2",
+                    "font-weight": 1000,
+                });
+            } else {
+                if (item.is_paid === 1) {
+                    if (item.status === 1) {
+                        p.text("已处理");
+                        p.css({
+                            "color": "#09bb07",
+                            "font-weight": 1000,
+                        });
+                    } else {
+                        p.text("待处理");
+                        p.css({
+                            "color": "#ffbe00",
+                            "font-weight": 1000,
+                        });
+                    }
+                } else {
+                    p.text("待支付");
+                    p.css({
+                        "color": "#f76260",
+                        "font-weight": 1000,
+                    });
+                }
+            }
+
+            order_deal.append(p);
+            order.append(order_deal);
+            weui_cells.append(order);
+
+            item.orderItemList.forEach(function (subItem) {
+                let weui_cells__bdcart_list = $("<div class='weui-cell__bdcart_List'>");
+                let listImg = $("<div class='list_Img'>");
+                let img = $("<img />");
+                img.attr("src", subItem.cover_img);
+                listImg.append(img);
+                weui_cells__bdcart_list.append(listImg);
+                let list_detail = $("<div class='list_detail'>");
+                let list_type = $("<div class='list_type'>");
+                let name = $("<div class='name'>");
+                name.text(subItem.goods_name);
+                list_type.append(name);
+                list_type.append($("<div class='g'>500g</div>"));
+                list_detail.append(list_type);
+                let integral_number = $("<div class='integral_number'>");
+                let integral = $("<div class='integral'></div>");
+                integral.text(subItem.price + "元");
+                integral_number.append(integral);
+                let number = $("<div class='number'>");
+                number.text("x " + subItem.quantity);
+                integral_number.append(number);
+                list_detail.append(integral_number);
+                weui_cells__bdcart_list.append(list_detail);
+                weui_cells.append(weui_cells__bdcart_list);
+            });
+            let consumption_result = $("<div class='consumption_results'>");
+            let consumption_integral = $("<div class='consumption_integral'>");
+            let all_consumption = $("<div class='all_consumption'>共消费: </div>'");
+            consumption_integral.append(all_consumption);
+            let number_consumption = $("<div class='number_consumption'></div>");
+            number_consumption.text(item.total_price + "元");
+            consumption_integral.append(number_consumption);
+            consumption_result.append(consumption_integral);
+            let btn = $("<button class='weui-btn select_btn'></button>");
+            btn.css({
+                "width": "90px",
+                "margin-left": "0px",
+                "margin-right": "0px",
+            });
+            let detail_p = $("<p>查看</p>");
+            btn.append(detail_p);
+            btn.on("click", doOrderDetail);
+            consumption_result.append(btn);
+            weui_cells.append(consumption_result);
+            bd.append(weui_cells)
+        })
+    }
+
+    function doOrderDetail() {
+        let order_id = $(this).parent().parent().data("order_id");
+        $("#slidder").data("order_id", order_id).load("/order/doOrderToPayUI");
+    }
+</script>
