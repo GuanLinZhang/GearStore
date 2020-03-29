@@ -40,7 +40,7 @@ public class CategoryController {
     public JSONResponse saveCategory(Category category) {
         int result = categoryService.saveNewCategory(category);
         return result == 1 ? new JSONResponse(1, "保存成功", category) :
-                new JSONResponse(0, "保存失败", category);
+                new JSONResponse(0, "已存在", category);
     }
 
     @PutMapping("update")

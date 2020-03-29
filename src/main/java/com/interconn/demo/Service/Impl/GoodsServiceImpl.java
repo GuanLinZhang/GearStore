@@ -4,9 +4,11 @@ import cn.hutool.core.util.IdUtil;
 import com.interconn.demo.Dao.GoodsDao;
 import com.interconn.demo.Entity.Goods;
 import com.interconn.demo.Service.GoodsService;
+import com.interconn.demo.Service.S3Service;
 import com.interconn.demo.vo.PageObject;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FilenameUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,10 +23,15 @@ import java.util.UUID;
 @Slf4j
 public class GoodsServiceImpl implements GoodsService {
     private final GoodsDao goodsDao;
+    private final S3Service s3Service;
+    private final String cdnEndpoint;
+
 
     @Autowired
-    public GoodsServiceImpl(GoodsDao goodsDao) {
+    public GoodsServiceImpl(GoodsDao goodsDao, S3Service s3Service, String cdnEndpoint) {
         this.goodsDao = goodsDao;
+        this.s3Service = s3Service;
+        this.cdnEndpoint = cdnEndpoint;
     }
 
 
@@ -60,18 +67,20 @@ public class GoodsServiceImpl implements GoodsService {
 
     @Override
     @Transactional
-    public int saveGoods(Goods entity, MultipartFile file) {
-        int result = 0;
-        entity.setGoods_id(IdUtil.fastSimpleUUID());
+    public void saveGoods(Goods entity, MultipartFile file) {
         try {
-            String imgUrl = uploadImage(file);
-            entity.setCover_img(imgUrl);
-            result = goodsDao.saveObject(entity);
+            String originalFilename = file.getOriginalFilename();
+            String UUID = IdUtil.fastSimpleUUID();
+            String fileName = UUID +
+                    "." + FilenameUtils.getExtension(originalFilename);
+            s3Service.uploadFileToS3Bucket(file, fileName, true);
+            entity.setGoods_id(UUID);
+            entity.setCover_img(cdnEndpoint + fileName);
+            goodsDao.saveObject(entity);
         } catch (Exception e) {
             e.printStackTrace();
-            log.warn(e.getLocalizedMessage());
+            throw e;
         }
-        return result;
     }
 
     @Override

@@ -1,3 +1,12 @@
+<style>
+  .addCategory {
+    float: right;
+  }
+
+  .confidence {
+    font-size: 100%;
+  }
+</style>
 <div class="card shadow mb-4">
   <div class="card-header py-3">
     <h6 class="m-0 font-weight-bold text-primary">商品管理</h6>
@@ -83,7 +92,7 @@
               <input type="text" id="changePrice" class="form-control"
                      aria-label="Dollar amount (with dot and two decimal places)">
               <div class="input-group-append">
-                <span class="input-group-text">元/500g</span>
+                <span class="input-group-text">元</span>
               </div>
             </div>
           </form>
@@ -108,7 +117,7 @@
           </button>
         </div>
         <div class="modal-body">
-          <form>
+          <div>
             <div class="form-group">
               <label for="add_Serialn_number" class="col-form-label">商品编号:</label>
               <input type="text" class="form-control" id="add_Serialn_number">
@@ -123,6 +132,20 @@
             <div class="form-group">
               <select class="form-control col-form-label" id="addCategory"> <!--  添加商品种类,动态下拉菜单-->
               </select>
+            </div>
+            <label for="predictCategory" class="col-form-label">预测分类:</label>
+            <div class="form-group">
+              <ul class="list-group" id="predictCategory">
+                <!--                <li class="list-group-item">Cras justo odiobtn-->
+                <!--                  <span class="badge badge-primary badge-pill">14</span>-->
+                <!--                  <button class="btn btn-primary addCategory"></button>-->
+                <!--                </li>-->
+                <!--                <li class="list-group-item">Dapibus ac facilisis in</li>-->
+                <!--                <li class="list-group-item">Morbi leo risus</li>-->
+                <!--                <li class="list-group-item">Porta ac consectetur ac</li>-->
+                <!--                <li class="list-group-item">Vestibulum at eros</li>-->
+                <!--              </ul>-->
+              </ul>
             </div>
             <label for="thumbnailInput" class="col-form-label">添加封面图:</label>
             <div class="input-group form-group">
@@ -140,11 +163,11 @@
               <input type="text" id="addPrice" class="form-control"
                      aria-label="Dollar amount (with dot and two decimal places)">
               <div class="input-group-append">
-                <span class="input-group-text">元/500g</span>
+                <span class="input-group-text">元</span>
 
               </div>
             </div>
-          </form>
+          </div>
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-dismiss="modal">取消添加</button>
@@ -165,6 +188,14 @@
         $("#determineAdd").on("click", saveGoods);
         $("#addUser").on("click", empty);
         renderCategory();
+        $("#exampleModal2").on('hidden.bs.modal', function () {
+            $("#add_Serialn_number").val("");
+            $("#addGoodsName").val("");
+            $("#addCategory").val("");
+            $("#predictCategory").empty();
+            $("#addPrice").val("");
+            $("#thumbNailBox").attr("src", "");
+        })
     });
 
     /**添加商品时候照片回显*/
@@ -176,12 +207,80 @@
             input_File.val("");
         }
         var src = window.URL.createObjectURL(file);
-        console.log("src", src);
+        // console.log("src", src);
         $("img#thumbNailBox").attr({
             src: src,
             width: 100 + '%',
             height: 100 + '%',
         });
+        let formData = new FormData();
+        formData.set("file", file);
+        $.ajax({
+            url: "/goods/detect",
+            method: "post",
+            contentType: false,
+            processData: false,
+            data: formData
+        }).done(function (res) {
+            // console.log(res.data.labels);
+            renderLabels(res.data.labels);
+        })
+    }
+
+    // <ul class="list-group" id="predictCategory">
+    //     <li class="list-group-item">Cras justo odiobtn
+    // <span class="badge badge-primary badge-pill">14</span>
+    //     <button class="btn btn-primary addCategory"></button>
+    //     </li>
+    //     <li class="list-group-item">Dapibus ac facilisis in</li>
+    // <li class="list-group-item">Morbi leo risus</li>
+    // <li class="list-group-item">Porta ac consectetur ac</li>
+    // <li class="list-group-item">Vestibulum at eros</li>
+    // </ul>
+    function renderLabels(labels) {
+        let predictCategory = $("#predictCategory");
+        labels.forEach(label => {
+            let li = $("<li class='list-group-item'>");
+            li.text(label.name);
+            let confidence = label.confidence;
+            let span = $("<span class='badge badge-pill confidence'>");
+            span.addClass("badge-" + getConfidenceLevel(confidence));
+            span.text(label.confidence.toFixed(2));
+            console.log(span);
+            li.append(span);
+            let btn = $("<button class='btn btn-primary addCategory'>");
+            btn.text("添加类别");
+            btn.attr("label-name", label.name);
+            btn.on("click", addCategoryBtnClicked);
+            li.append(btn);
+            predictCategory.append(li);
+        })
+    }
+
+    function addCategoryBtnClicked() {
+        let category_name = $(this).attr("label-name");
+        $.ajax({
+            url: "/category/save",
+            method: "post",
+            data: {
+                category_name: category_name
+            }
+        }).done(function (res) {
+            // console.log((res))
+            alert(res.message);
+            renderCategory();
+        })
+
+    }
+
+    function getConfidenceLevel(degree) {
+        if (degree >= 80) {
+            return "success";
+        } else if (degree >= 50) {
+            return "warning";
+        } else {
+            return "danger";
+        }
     }
 
     /**更改商品时候照片回显*/
@@ -208,6 +307,7 @@
         $("#add_Serialn_number").val("");
         $("#addGoodsName").val("");
         $("#addCategory").val("");
+        $("#predictCategory").val("");
         $("#addPrice").val("");
         $("#thumbNailBox").attr("src", "");
         $("#exampleModal2").modal("show");
@@ -496,7 +596,7 @@
         let price = $("#changePrice").val();   //商品价钱
         formData.set("price", price);
 
-        if (changeGoodsName === "" || Img === "" || price == "") {
+        if (changeGoodsName === "" || Img === "" || price === "") {
             alert("商品信息不能为空");
             return;
         }
@@ -541,7 +641,7 @@
         if (cls === "pre page-link" && pageCurrent > 1) {
             pageCurrent--;
         }
-        if (cls === "next page-link" && pageCurrent < pageCount) {
+        if (cls === "next page-link " && pageCurrent < pageCount) {
             pageCurrent++;
         }
         if (cls === "last page-link") {

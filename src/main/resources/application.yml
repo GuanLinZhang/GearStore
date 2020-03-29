@@ -6,9 +6,9 @@ server:
 spring:
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://114.116.41.242:3306/app?useUnicode=true&characterEncoding=utf8
+    url: jdbc:mysql://52.80.104.21/app?useSSL=false&useUnicode=true&characterEncoding=utf-8&useLegacyDatetimeCode=false&serverTimezone=Asia/Shanghai
     username: root
-    password: 123456
+    password: zhangyue123456
     druid:
       # 初始化大小，最小，最大
       initialSize: 5
@@ -66,3 +66,12 @@ logging:
     com.interconn.demo.Dao: trace
   file: inter.log
   path: /log
+
+aws:
+  region:
+    ap-northeast-1
+  s3:
+    bucket: homework-asset
+    endpoint: https://homework-asset.s3-ap-northeast-1.amazonaws.com/
+  cloudfront:
+    endpoint: https://d29342050d1gdw.cloudfront.net/

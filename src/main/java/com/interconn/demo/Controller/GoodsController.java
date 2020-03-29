@@ -2,6 +2,7 @@ package com.interconn.demo.Controller;
 
 import com.interconn.demo.Entity.Goods;
 import com.interconn.demo.Service.GoodsService;
+import com.interconn.demo.Service.RekognitionService;
 import com.interconn.demo.vo.JSONResponse;
 import com.interconn.demo.vo.PageObject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,10 +14,13 @@ import org.springframework.web.multipart.MultipartFile;
 @RequestMapping("/goods")
 public class GoodsController {
     private final GoodsService goodsService;
+    private final RekognitionService rekognitionService;
+
 
     @Autowired
-    public GoodsController(GoodsService goodsService) {
+    public GoodsController(GoodsService goodsService, RekognitionService rekognitionService) {
         this.goodsService = goodsService;
+        this.rekognitionService = rekognitionService;
     }
 
     @GetMapping("get")
@@ -34,9 +38,13 @@ public class GoodsController {
     @ResponseBody
     public JSONResponse saveGoods(Goods goods,
                                   @RequestParam("coverImg") MultipartFile coverImg) {
-        int result = goodsService.saveGoods(goods, coverImg);
-        return result == 1 ? new JSONResponse(1, "保存成功", goods) :
-                new JSONResponse(0, "保存失败", goods);
+        try {
+            goodsService.saveGoods(goods, coverImg);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new JSONResponse(0, e.getLocalizedMessage());
+        }
+        return new JSONResponse(1, "success", goods);
     }
 
     @PutMapping("update")
@@ -65,5 +73,21 @@ public class GoodsController {
     @GetMapping("doGoodsList")
     public String doGoodsUI() {
         return "/admin/view/goods_list.html";
+    }
+
+
+    @PostMapping("detect")
+    @ResponseBody
+    public JSONResponse detectLabels(@RequestParam("file") MultipartFile file) {
+        JSONResponse response = new JSONResponse();
+        try {
+            response.setData(rekognitionService.detectLabels(file));
+            response.setMessage("success");
+            response.setState(1);
+        } catch (Exception e) {
+            response.setMessage(e.getLocalizedMessage());
+            response.setState(0);
+        }
+        return response;
     }
 }
