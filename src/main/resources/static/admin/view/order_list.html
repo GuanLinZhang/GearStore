@@ -82,12 +82,7 @@
             <label class="col-form-label">详细:</label>
             <div class="form-group">
               <ul class="list-group" id="itemList">
-                <!--                <li class="list-group-item justify-content-between align-items-center">-->
-                <!--                  Cras justo odio-->
-                <!--                  <span class="badge badge-info">小计: </span>-->
-                <!--                  <span class="badge badge-danger">数量: 3</span>-->
-                <!--                  <span class="badge badge-primary">单价: 14元 / 500g</span>-->
-                <!--                </li>-->
+
               </ul>
             </div>
 
@@ -385,7 +380,7 @@
             quantity.text("数量: " + item.quantity);
             li.append(quantity);
             let price = $("<span class='badge badge-warning'>");
-            price.text("单价: " + item.price + "元/500g");
+            price.text("单价: " + item.price + "元");
             li.append(price);
             orderItem.append(li);
         })

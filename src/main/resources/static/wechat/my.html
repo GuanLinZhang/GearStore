@@ -101,6 +101,12 @@
             }
         }).done(function (res) {
             let data = res.data[0];
+            console.log(res)
+            if(data == null) {
+                $.alert("请填写收货地址");
+                $("#slidder").load("/doExpressUI");
+                return;
+            }
             $(".user_home").text(data.address);
             $(".phone_number").text(data.telephone);
             $.hideLoading();

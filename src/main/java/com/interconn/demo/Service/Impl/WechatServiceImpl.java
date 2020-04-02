@@ -40,7 +40,7 @@ public class WechatServiceImpl implements WechatService {
 //        String appId = (String) template.opsForValue().get("appId");
 //        String appSecret = (String) template.opsForValue().get("appSecret");
 //        return new WechatConfig(appId, appSecret);
-        return new WechatConfig("wx5c0fbbbf3e5cdd89", "07c751b6e365cde4cb5f22325598ea2d");
+        return new WechatConfig("wx9de8d36f3e4d901e", "0849cd5a39afee37fb921c3bb4e3aefc");
     }
 
     /***

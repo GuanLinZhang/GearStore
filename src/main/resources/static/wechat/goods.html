@@ -10,7 +10,7 @@
       <label class="weui-search-bar__label" id="searchText"
              style="background-color: #e5e5e5;border-radius: 10px;">
         <i class="weui-icon-search"></i>
-        <span>您要的瓜果蔬菜都在这里</span>
+        <span>装备页面</span>
       </label>
     </div>
     <a href="javascript:" class="weui-search-bar__cancel-btn" id="searchCancel">取消</a>
@@ -60,10 +60,8 @@
 
   <!--  详情区-->
   <div class="weui-tab__bd">
-    <!--    蔬菜区详情-->
     <div id="tab1" class="weui-tab__bd-item weui-tab__bd-item--active">
     </div>
-    <!--    水果区详情-->
   </div>
   <a id="form-submit" class="weui-btn weui-btn_primary  ladda-button btn-block" data-style="expand-right"
      data-size="l">
@@ -218,7 +216,7 @@
             ve_type.text(item.goods_name);
             ve_Detail.append(ve_type);
             let ve_g = $("<div class='ve_g'></div>");
-            ve_g.text(item.price + "元/500g");
+            ve_g.text(item.price + "元");
             ve_Detail.append(ve_g);
             ve_Number.append(ve_Detail);
 
